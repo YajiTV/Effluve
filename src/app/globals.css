@@ -1,0 +1,153 @@
+@import "tailwindcss";
+
+/* ============================================ */
+/* POLICES SYSTEMES                            */
+/* ============================================ */
+
+@font-face {
+    font-family: 'Bodoni72';
+    src: local('Bodoni 72'), local('Bodoni72'), local('Bodoni 72 Book'), local('Bodoni MT'), local('Didot');
+    font-style: normal;
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: 'Helvetica';
+    src: local('Helvetica'), local('Arial'), local('Liberation Sans');
+    font-style: normal;
+    font-weight: normal;
+}
+
+/* ============================================ */
+/* VARIABLES CSS                               */
+/* ============================================ */
+
+:root {
+    /* Polices */
+    --font-title: 'Bodoni72', 'Bodoni 72', 'Bodoni MT', 'Didot', serif;
+    --font-body: 'Helvetica', Arial, 'Liberation Sans', sans-serif;
+
+    /* Couleurs Angora */
+    --angora-black: #000000;
+    --angora-white: #FFFFFF;
+    --angora-vanilla: #CFC1A7;
+    --angora-nero: #222222;
+}
+
+/* ============================================ */
+/* CLASSES UTILITAIRES POLICES                 */
+/* ============================================ */
+
+.font-title {
+    font-family: var(--font-title);
+}
+
+.font-body {
+    font-family: var(--font-body);
+}
+
+/* ============================================ */
+/* STYLES DE BASE                              */
+/* ============================================ */
+
+body {
+    background: var(--angora-white);
+    color: var(--angora-nero);
+    font-family: var(--font-body);
+}
+
+/* ============================================ */
+/* ANIMATIONS & TRANSITIONS                    */
+/* ============================================ */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fadeIn {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Smooth scroll */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Backdrop blur support */
+@supports (backdrop-filter: blur(12px)) {
+    header {
+        backdrop-filter: blur(12px);
+    }
+}
+
+/* Amélioration du hover sur desktop uniquement */
+@media (hover: hover) {
+    button:hover,
+    a:hover {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+}
+
+/* ============================================ */
+/* UTILITAIRES PERSONNALISÉS                   */
+/* ============================================ */
+
+.text-balance {
+    text-wrap: balance;
+}
+
+.transition-smooth {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ============================================ */
+/* ANIMATIONS CART                             */
+/* ============================================ */
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes bounceScale {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.animate-slideInRight {
+    animation: slideInRight 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.animate-bounceScale {
+    animation: bounceScale 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.animate-pulse {
+    animation: pulse 0.6s ease-in-out;
+}
