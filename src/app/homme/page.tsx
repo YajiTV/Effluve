@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { pool } from "@/lib/db";
 import type { RowDataPacket } from "mysql2/promise";
+import ProductActions from "./ProductActions";
 
 export const dynamic = "force-dynamic";
 
@@ -12,6 +13,7 @@ type ProductRow = RowDataPacket & {
   price_cents: number;
   image_url: string | null;
   category: "homme" | "femme" | "accessoires";
+  is_active: 0 | 1; // pour inStock
 };
 
 function eurFromCents(cents: number) {
@@ -21,7 +23,7 @@ function eurFromCents(cents: number) {
 export default async function HommePage() {
   const [products] = await pool.query<ProductRow[]>(
     `
-    SELECT id, name, description, price_cents, image_url, category
+    SELECT id, name, description, price_cents, image_url, category, is_active
     FROM products
     WHERE category = 'homme' AND is_active = 1
     ORDER BY created_at DESC
@@ -54,11 +56,19 @@ export default async function HommePage() {
             >
               Voir toute la collection
             </Link>
+
             <Link
               href="/cart"
               className="inline-flex h-11 items-center justify-center rounded-xl border border-neutral-300 bg-white px-5 text-sm font-semibold text-neutral-900 hover:border-neutral-400 transition"
             >
               Mon panier
+            </Link>
+
+            <Link
+              href="/wishlist"
+              className="inline-flex h-11 items-center justify-center rounded-xl border border-neutral-300 bg-white px-5 text-sm font-semibold text-neutral-900 hover:border-neutral-400 transition"
+            >
+              Mes favoris
             </Link>
           </div>
         </div>
@@ -68,9 +78,12 @@ export default async function HommePage() {
       <section className="mx-auto max-w-6xl px-4 py-12">
         {products.length === 0 ? (
           <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
-            <p className="font-semibold text-neutral-900">Aucun produit homme pour le moment.</p>
+            <p className="font-semibold text-neutral-900">
+              Aucun produit homme pour le moment.
+            </p>
             <p className="mt-1 text-neutral-600">
-              Ajoute un produit dans la table <code className="font-mono">products</code> pour le voir ici.
+              Ajoute un produit dans la table{" "}
+              <code className="font-mono">products</code> pour le voir ici.
             </p>
           </div>
         ) : (
@@ -96,9 +109,14 @@ export default async function HommePage() {
                 </div>
 
                 <div className="p-4">
-                  <h2 className="text-base font-semibold text-neutral-900">{p.name}</h2>
+                  <h2 className="text-base font-semibold text-neutral-900">
+                    {p.name}
+                  </h2>
+
                   {p.description ? (
-                    <p className="mt-1 line-clamp-2 text-sm text-neutral-600">{p.description}</p>
+                    <p className="mt-1 line-clamp-2 text-sm text-neutral-600">
+                      {p.description}
+                    </p>
                   ) : (
                     <p className="mt-1 text-sm text-neutral-500">—</p>
                   )}
@@ -108,13 +126,8 @@ export default async function HommePage() {
                       {eurFromCents(p.price_cents)} €
                     </p>
 
-                    {/* TODO: brancher sur ton endpoint d'ajout panier */}
-                    <button
-                      disabled
-                      className="inline-flex h-10 items-center justify-center rounded-xl bg-neutral-900 px-4 text-sm font-semibold text-white opacity-60"
-                    >
-                      Ajouter au panier
-                    </button>
+                    {/* Actions (client) : panier + favoris */}
+                    <ProductActions productId={p.id} inStock={Boolean(p.is_active)} />
                   </div>
                 </div>
               </article>
