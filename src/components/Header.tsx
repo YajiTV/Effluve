@@ -25,21 +25,21 @@ export default function Header() {
                                 className="group relative font-body text-xs uppercase tracking-[0.15em] text-angora-black transition-all duration-300 hover:text-angora-vanilla"
                             >
                                 Femme
-                                <span className="absolute bottom-[-8px] left-0 w-0 h-[1px] bg-angora-vanilla transition-all duration-300 group-hover:w-full" />
+                            <span className="absolute -bottom-2 left-0 w-0 h-px bg-angora-vanilla transition-all duration-300 group-hover:w-full" />
                             </Link>
                             <Link
                                 href="/homme"
                                 className="group relative font-body text-xs uppercase tracking-[0.15em] text-angora-black transition-all duration-300 hover:text-angora-vanilla"
                             >
                                 Homme
-                                <span className="absolute bottom-[-8px] left-0 w-0 h-[1px] bg-angora-vanilla transition-all duration-300 group-hover:w-full" />
+                            <span className="absolute -bottom-2 left-0 w-0 h-px bg-angora-vanilla transition-all duration-300 group-hover:w-full" />
                             </Link>
                             <Link
                                 href="/collection"
                                 className="group relative font-body text-xs uppercase tracking-[0.15em] text-angora-black transition-all duration-300 hover:text-angora-vanilla"
                             >
                                 Collection
-                                <span className="absolute bottom-[-8px] left-0 w-0 h-[1px] bg-angora-vanilla transition-all duration-300 group-hover:w-full" />
+                            <span className="absolute -bottom-2 left-0 w-0 h-px bg-angora-vanilla transition-all duration-300 group-hover:w-full" />
                             </Link>
                         </nav>
 

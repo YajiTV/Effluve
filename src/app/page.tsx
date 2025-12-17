@@ -1,5 +1,5 @@
 // ============================================
-// PAGE D'ACCUEIL - ANGORA
+// PAGE HEADER - ANGORA
 // ============================================
 
 import Link from 'next/link';
@@ -28,7 +28,7 @@ export default function Home() {
                     Angora
                 </h1>
                 <p className="font-body text-lg md:text-xl text-angora-white mb-4 max-w-2xl drop-shadow-md">
-                    L'élégance moderne, minimaliste et durable.
+                    L&apos;élégance moderne, minimaliste et durable.
                 </p>
                 <p className="font-body text-base text-angora-white/90 mb-8 max-w-xl drop-shadow-md">
                     Découvrez notre collection 100% coton & laine, made in France.

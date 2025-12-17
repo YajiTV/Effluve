@@ -12,9 +12,9 @@ function CartToast({ productName, onClose }: { productName: string; onClose: () 
     }, [onClose]);
 
     return (
-        <div className="fixed top-24 right-6 z-[100] animate-slideInRight">
+        <div className="fixed top-24 right-6 z-100 animate-slideInRight">
             <div className="bg-angora-white border border-angora-vanilla shadow-2xl p-6 max-w-sm flex items-start gap-4">
-                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center shrink-0">
                     <CheckCircle className="w-6 h-6 text-green-700" strokeWidth={2} />
                 </div>
                 <div className="flex-1">
@@ -23,7 +23,7 @@ function CartToast({ productName, onClose }: { productName: string; onClose: () 
                     </p>
                     <p className="font-body text-sm text-angora-black">{productName}</p>
                 </div>
-                <button onClick={onClose} className="flex-shrink-0 p-1 hover:bg-angora-vanilla/20 rounded-full transition-colors">
+                <button onClick={onClose} className="shrink-0 p-1 hover:bg-angora-vanilla/20 rounded-full transition-colors">
                     <X className="w-4 h-4 text-angora-nero" strokeWidth={1.5} />
                 </button>
             </div>
@@ -39,9 +39,9 @@ function FavoriteToast({ productName, onClose }: { productName: string; onClose:
     }, [onClose]);
 
     return (
-        <div className="fixed top-24 right-6 z-[100] animate-slideInRight">
+        <div className="fixed top-24 right-6 z-100 animate-slideInRight">
             <div className="bg-angora-white border border-angora-vanilla shadow-2xl p-6 max-w-sm flex items-start gap-4">
-                <div className="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center shrink-0">
                     <Heart className="w-6 h-6 text-pink-600 fill-pink-600" strokeWidth={2} />
                 </div>
                 <div className="flex-1">
@@ -50,7 +50,7 @@ function FavoriteToast({ productName, onClose }: { productName: string; onClose:
                     </p>
                     <p className="font-body text-sm text-angora-black">{productName}</p>
                 </div>
-                <button onClick={onClose} className="flex-shrink-0 p-1 hover:bg-angora-vanilla/20 rounded-full transition-colors">
+                <button onClick={onClose} className="shrink-0 p-1 hover:bg-angora-vanilla/20 rounded-full transition-colors">
                     <X className="w-4 h-4 text-angora-nero" strokeWidth={1.5} />
                 </button>
             </div>
@@ -65,6 +65,7 @@ export default function HommePage() {
     const [addingToCart, setAddingToCart] = useState<number | null>(null);
     const [favorites, setFavorites] = useState<number[]>([]);
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const productsData = [
         {
             id: 1,
@@ -135,7 +136,7 @@ export default function HommePage() {
             default:
                 return sorted.sort((a, b) => b.dateAjout.getTime() - a.dateAjout.getTime());
         }
-    }, [sortBy]);
+    }, [productsData, sortBy]);
 
     const handleAddToCart = (e: React.MouseEvent, product: typeof productsData[0]) => {
         e.preventDefault();
@@ -222,7 +223,7 @@ export default function HommePage() {
                             <div key={product.id} className="group">
                                 <Link href={`/homme/${product.id}`}>
                                     <div className="relative">
-                                        <div className={`aspect-[3/4] bg-neutral-100 mb-4 overflow-hidden relative transition-transform duration-300 ${addingToCart === product.id ? 'scale-95' : 'group-hover:scale-[1.02]'}`}>
+                                        <div className={`aspect-3/4 bg-neutral-100 mb-4 overflow-hidden relative transition-transform duration-300 ${addingToCart === product.id ? 'scale-95' : 'group-hover:scale-[1.02]'}`}>
 
                                             <div className="absolute inset-0 flex items-center justify-center">
                         <span className="font-body text-xs text-neutral-400 uppercase tracking-wider text-center px-4">
