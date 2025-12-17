@@ -18,9 +18,9 @@ export default function CartToast({ productName, onClose }: CartToastProps) {
     }, [onClose]);
 
     return (
-        <div className="fixed top-24 right-6 z-[100] animate-slideInRight">
+        <div className="fixed top-24 right-6 z-100 animate-slideInRight">
             <div className="bg-angora-white border border-angora-vanilla shadow-2xl p-6 max-w-sm flex items-start gap-4">
-                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center shrink-0">
                     <CheckCircle className="w-6 h-6 text-green-700" strokeWidth={2} />
                 </div>
 
@@ -35,7 +35,7 @@ export default function CartToast({ productName, onClose }: CartToastProps) {
 
                 <button
                     onClick={onClose}
-                    className="flex-shrink-0 p-1 hover:bg-angora-vanilla/20 rounded-full transition-colors"
+                    className="shrink-0 p-1 hover:bg-angora-vanilla/20 rounded-full transition-colors"
                 >
                     <X className="w-4 h-4 text-angora-nero" strokeWidth={1.5} />
                 </button>

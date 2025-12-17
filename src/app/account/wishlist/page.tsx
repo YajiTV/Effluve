@@ -84,7 +84,7 @@ export default function WishlistPage() {
                             >
                                 {/* Image */}
                                 <Link href={`/${item.category.toLowerCase()}/${item.id}`}>
-                                    <div className="aspect-[3/4] bg-neutral-100 relative overflow-hidden">
+                                    <div className="aspect-3/4 bg-neutral-100 relative overflow-hidden">
                                         <div className="absolute inset-0 flex items-center justify-center">
                       <span className="font-body text-xs text-neutral-400 uppercase tracking-wider text-center px-4">
                         {item.name}
