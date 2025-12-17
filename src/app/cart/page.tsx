@@ -21,7 +21,7 @@ function eurFromCents(cents: number) {
 
 function GuestGate() {
   return (
-    <main className="min-h-[70vh] bg-gradient-to-b from-neutral-50 to-white px-4 py-14">
+    <main className="min-h-[70vh] bg-linear-to-b from-neutral-50 to-white px-4 py-14">
       <section className="mx-auto w-full max-w-3xl">
         <div className="mb-8">
           <p className="text-xs font-semibold tracking-[0.22em] text-neutral-500 uppercase">
@@ -91,7 +91,7 @@ export default async function CartPage() {
   );
 
   return (
-    <main className="min-h-[70vh] bg-gradient-to-b from-neutral-50 to-white px-4 py-14">
+    <main className="min-h-[70vh] bg-linear-to-b from-neutral-50 to-white px-4 py-14">
       <section className="mx-auto w-full max-w-5xl">
         <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
@@ -153,7 +153,6 @@ export default async function CartPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-[140px_1fr]">
                       <div className="bg-neutral-100">
                         {item.image_url ? (
-                          // Si tu veux, on peut le remplacer par <Image/> plus tard.
                           <img
                             src={item.image_url}
                             alt={item.name}
@@ -251,9 +250,6 @@ export default async function CartPage() {
                 Passer au paiement
               </button>
 
-              <p className="mt-3 text-xs text-neutral-500">
-                Paiement désactivé pour l’instant (à connecter plus tard).
-              </p>
             </div>
           </aside>
         </div>
