@@ -162,7 +162,7 @@ export default function WishlistPage() {
               >
                 {/* Image */}
                 <Link href={`/${item.category.toLowerCase()}/${item.productId}`}>
-                  <div className="relative overflow-hidden bg-neutral-100 aspect-[3/4]">
+                  <div className="relative overflow-hidden bg-neutral-100 aspect-3/4">
                     {item.image ? (
                       <img
                         src={item.image}

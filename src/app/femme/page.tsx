@@ -23,13 +23,21 @@ function eurFromCents(cents: number) {
 
 export default async function FemmePage() {
   const [products] = await pool.query<ProductRow[]>(
-    `
-    SELECT id, name, description, price_cents, image_url, category, is_active
-    FROM products
-    WHERE category = 'femme' AND is_active = 1
-    ORDER BY created_at DESC
-    `
-  );
+  `
+  SELECT
+    id,
+    name,
+    description,
+    pricecents AS price_cents,
+    imageurl AS image_url,
+    category,
+    isactive AS is_active
+  FROM products
+  WHERE category = 'femme' AND isactive = 1
+  ORDER BY id DESC
+  `
+);
+
 
   return (
     <main className="bg-white">
