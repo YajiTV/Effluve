@@ -28,14 +28,15 @@ export default async function HommePage() {
     name,
     description,
     pricecents AS price_cents,
-    imageurl AS image_url,
+    imageurl   AS image_url,
     category,
-    isactive AS is_active
+    isactive   AS is_active
   FROM products
   WHERE category = 'homme' AND isactive = 1
   ORDER BY id DESC
   `
 );
+
 
 
   return (

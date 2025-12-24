@@ -21,23 +21,24 @@ export async function GET() {
   }
 
   const [rows] = await pool.query<WishlistRow[]>(
-    `
-    SELECT
-      w.id          AS wishlist_item_id,
-      p.id          AS product_id,
-      p.name,
-      p.description,
-      p.price_cents,
-      p.image_url,
-      p.category,
-      p.is_active   AS in_stock
-    FROM wishlist_items w
-    JOIN products p ON p.id = w.product_id
-    WHERE w.user_id = ?
-    ORDER BY w.created_at DESC
-    `,
-    [user.id]
-  );
+  `
+  SELECT
+    w.id           AS wishlist_item_id,
+    p.id           AS product_id,
+    p.name,
+    p.description,
+    p.pricecents   AS price_cents,
+    p.imageurl     AS image_url,
+    p.category,
+    p.isactive     AS in_stock
+  FROM wishlist_items w
+  JOIN products p ON p.id = w.product_id
+  WHERE w.user_id = ?
+  ORDER BY w.created_at DESC
+  `,
+  [user.id]
+);
+
 
   return NextResponse.json(
     rows.map((r) => ({

@@ -2,9 +2,6 @@
 import { NextResponse } from "next/server";
 import { pool } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth";
-import type { RowDataPacket } from "mysql2/promise";
-
-type CartExistingRow = RowDataPacket & { id: number };
 
 function errorMessage(err: unknown): string {
   if (err instanceof Error) return err.message;
@@ -30,21 +27,14 @@ export async function POST(req: Request) {
     const productId = Number(body?.productId);
     if (!productId) return NextResponse.json({ error: "INVALID_PRODUCT" }, { status: 400 });
 
-    const [existing] = await pool.query<CartExistingRow[]>(
-      "SELECT id FROM cart_items WHERE user_id = ? AND product_id = ? LIMIT 1",
+    await pool.query(
+      `
+      INSERT INTO cart_items (user_id, product_id, quantity)
+      VALUES (?, ?, 1)
+      ON DUPLICATE KEY UPDATE quantity = quantity + 1
+      `,
       [user.id, productId]
     );
-
-    if (existing.length) {
-      await pool.query("UPDATE cart_items SET quantity = quantity + 1 WHERE id = ?", [
-        existing[0].id,
-      ]);
-    } else {
-      await pool.query(
-        "INSERT INTO cart_items (user_id, product_id, quantity) VALUES (?, ?, 1)",
-        [user.id, productId]
-      );
-    }
 
     return NextResponse.json({ ok: true });
   } catch (err: unknown) {
