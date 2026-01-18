@@ -69,12 +69,12 @@ export default async function CartPage() {
   const [rows] = await pool.query<CartRow[]>(
     `
     SELECT
-      ci.id        AS cartitemid,
-      ci.quantity  AS quantity,
-      p.id         AS productid,
-      p.name       AS name,
-      p.pricecents AS pricecents,
-      p.imageurl   AS imageurl
+    ci.id AS cartitemid,
+    ci.quantity AS quantity,
+    p.id AS productid,
+    p.name AS name,
+    p.pricecents AS pricecents,
+    p.imageurl AS imageurl
     FROM cart_items ci
     JOIN products p ON p.id = ci.product_id
     WHERE ci.user_id = ?

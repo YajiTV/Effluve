@@ -1,11 +1,13 @@
 import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
+import { ReactNode } from 'react';
 
 export type SessionUser = {
   id: number;
   email: string;
   full_name: string;
   role: 'customer' | 'admin';
+  admin: boolean;
 };
 
 const COOKIE_NAME = 'angora_session';
@@ -36,11 +38,13 @@ export async function verifySession(token: string): Promise<SessionUser | null> 
     if (!id) return null;
 
     return {
-      id,
-      email: String(payload.email ?? ''),
-      full_name: String(payload.full_name ?? ''),
-      role: (payload.role as SessionUser['role']) ?? 'customer',
-    };
+    id,
+    email: String(payload.email ?? ''),
+    full_name: String(payload.full_name ?? ''),
+    role: (payload.role as SessionUser['role']) ?? 'customer',
+    admin: ((payload.role as string) === 'admin'),
+  };
+
   } catch {
     return null;
   }

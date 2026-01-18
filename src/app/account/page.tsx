@@ -56,7 +56,9 @@ export default async function AccountPage() {
               <div className="space-y-2 font-body text-neutral-700">
                 <p><span className="text-neutral-500">Nom :</span> {user.full_name}</p>
                 <p><span className="text-neutral-500">Email :</span> {user.email}</p>
-                <p><span className="text-neutral-500">Rôle :</span> {user.role}</p>  Supprimer a la fin 
+                {user.role === 'admin' && (
+                   <p><span className="text-neutral-500">Rôle :</span> {user.role}</p>
+      )}
               </div>
             </div>
           </div>
