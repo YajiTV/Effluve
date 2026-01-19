@@ -5,17 +5,18 @@
 /* ============================================ */
 
 @font-face {
-    font-family: 'Bodoni72';
-    src: local('Bodoni 72'), local('Bodoni72'), local('Bodoni 72 Book'), local('Bodoni MT'), local('Didot');
-    font-style: normal;
-    font-weight: normal;
+  font-family: "Bodoni72";
+  src: local("Bodoni 72"), local("Bodoni72"), local("Bodoni 72 Book"),
+    local("Bodoni MT"), local("Didot");
+  font-style: normal;
+  font-weight: normal;
 }
 
 @font-face {
-    font-family: 'Helvetica';
-    src: local('Helvetica'), local('Arial'), local('Liberation Sans');
-    font-style: normal;
-    font-weight: normal;
+  font-family: "Helvetica";
+  src: local("Helvetica"), local("Arial"), local("Liberation Sans");
+  font-style: normal;
+  font-weight: normal;
 }
 
 /* ============================================ */
@@ -23,15 +24,15 @@
 /* ============================================ */
 
 :root {
-    /* Polices */
-    --font-title: 'Bodoni72', 'Bodoni 72', 'Bodoni MT', 'Didot', serif;
-    --font-body: 'Helvetica', Arial, 'Liberation Sans', sans-serif;
+  /* Polices */
+  --font-title: "Bodoni72", "Bodoni 72", "Bodoni MT", "Didot", serif;
+  --font-body: "Helvetica", Arial, "Liberation Sans", sans-serif;
 
-    /* Couleurs Angora */
-    --angora-black: #000000;
-    --angora-white: #FFFFFF;
-    --angora-vanilla: #CFC1A7;
-    --angora-nero: #222222;
+  /* Couleurs Angora */
+  --angora-black: #000000;
+  --angora-white: #ffffff;
+  --angora-vanilla: #cfc1a7;
+  --angora-nero: #222222;
 }
 
 /* ============================================ */
@@ -39,11 +40,11 @@
 /* ============================================ */
 
 .font-title {
-    font-family: var(--font-title);
+  font-family: var(--font-title);
 }
 
 .font-body {
-    font-family: var(--font-body);
+  font-family: var(--font-body);
 }
 
 /* ============================================ */
@@ -51,48 +52,29 @@
 /* ============================================ */
 
 body {
-    background: var(--angora-white);
-    color: var(--angora-nero);
-    font-family: var(--font-body);
-}
-
-/* ============================================ */
-/* ANIMATIONS & TRANSITIONS                    */
-/* ============================================ */
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.animate-fadeIn {
-    animation: fadeIn 0.3s ease-out;
+  background: var(--angora-white);
+  color: var(--angora-nero);
+  font-family: var(--font-body);
 }
 
 /* Smooth scroll */
 html {
-    scroll-behavior: smooth;
+  scroll-behavior: smooth;
 }
 
 /* Backdrop blur support */
 @supports (backdrop-filter: blur(12px)) {
-    header {
-        backdrop-filter: blur(12px);
-    }
+  header {
+    backdrop-filter: blur(12px);
+  }
 }
 
 /* Amélioration du hover sur desktop uniquement */
 @media (hover: hover) {
-    button:hover,
-    a:hover {
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
+  button:hover,
+  a:hover {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
 }
 
 /* ============================================ */
@@ -100,54 +82,71 @@ html {
 /* ============================================ */
 
 .text-balance {
-    text-wrap: balance;
+  text-wrap: balance;
 }
 
 .transition-smooth {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* ============================================ */
-/* ANIMATIONS CART                             */
+/* (Optionnel) Animation fade legacy            */
+/* Si tu as déjà des "animate-fadeIn" dans le code */
 /* ============================================ */
 
-@keyframes slideInRight {
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* ============================================ */
+/* TAILWIND v4 — Toast Animations (CSS-first)  */
+/* ============================================ */
+/* Tailwind v4 génère animate-cart-toast-in / animate-cart-toast-out
+   via les variables --animate-* dans @theme. [web:229][web:253] */
+
+@theme {
+  --animate-cart-toast-in: cart-toast-in 520ms cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-cart-toast-out: cart-toast-out 180ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  @keyframes cart-toast-in {
+    0% {
+      opacity: 0;
+      transform: translateX(20px) translateY(-6px) scale(0.98);
+      filter: blur(6px);
+    }
+    70% {
+      opacity: 1;
+      transform: translateX(-2px) translateY(0) scale(1.01);
+      filter: blur(0px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateX(0) translateY(0) scale(1);
+      filter: blur(0px);
+    }
+  }
+
+  @keyframes cart-toast-out {
     from {
-        opacity: 0;
-        transform: translateX(100%);
+      opacity: 1;
+      transform: translateX(0) scale(1);
+      filter: blur(0px);
     }
     to {
-        opacity: 1;
-        transform: translateX(0);
+      opacity: 0;
+      transform: translateX(10px) scale(0.99);
+      filter: blur(0px);
     }
-}
-
-@keyframes bounceScale {
-    0%, 100% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.2);
-    }
-}
-
-@keyframes pulse {
-    0%, 100% {
-        opacity: 1;
-    }
-    50% {
-        opacity: 0.5;
-    }
-}
-
-.animate-slideInRight {
-    animation: slideInRight 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.animate-bounceScale {
-    animation: bounceScale 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.animate-pulse {
-    animation: pulse 0.6s ease-in-out;
+  }
 }

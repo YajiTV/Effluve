@@ -3,6 +3,7 @@ import Link from "next/link";
 import { pool } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth";
 import type { RowDataPacket } from "mysql2/promise";
+import CartClient from "@/components/CartClient";
 
 export const dynamic = "force-dynamic";
 
@@ -14,10 +15,6 @@ type CartRow = RowDataPacket & {
   pricecents: number;
   imageurl: string | null;
 };
-
-function eurFromCents(cents: number) {
-  return Number(cents / 100).toFixed(2);
-}
 
 function GuestGate() {
   return (
@@ -42,6 +39,7 @@ function GuestGate() {
               Connecte-toi ou crée un compte pour voir ton panier.
             </p>
           </div>
+
           <div className="mt-5 flex flex-wrap gap-3">
             <Link
               href="/login?next=/cart"
@@ -69,12 +67,12 @@ export default async function CartPage() {
   const [rows] = await pool.query<CartRow[]>(
     `
     SELECT
-    ci.id AS cartitemid,
-    ci.quantity AS quantity,
-    p.id AS productid,
-    p.name AS name,
-    p.pricecents AS pricecents,
-    p.imageurl AS imageurl
+      ci.id        AS cartitemid,
+      ci.quantity  AS quantity,
+      p.id         AS productid,
+      p.name       AS name,
+      p.pricecents AS pricecents,
+      p.imageurl   AS imageurl
     FROM cart_items ci
     JOIN products p ON p.id = ci.product_id
     WHERE ci.user_id = ?
@@ -83,131 +81,6 @@ export default async function CartPage() {
     [user.id]
   );
 
-  const totalCents = rows.reduce(
-    (sum, r) => sum + Number(r.pricecents) * Number(r.quantity),
-    0
-  );
-
-  return (
-    <main className="min-h-[70vh] bg-gradient-to-b from-neutral-50 to-white px-4 py-14">
-      <section className="mx-auto w-full max-w-5xl">
-        <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <p className="text-xs font-semibold tracking-[0.22em] text-neutral-500 uppercase">
-              Panier
-            </p>
-            <h1 className="mt-2 text-3xl font-semibold tracking-tight text-neutral-900">
-              Mon panier
-            </h1>
-          </div>
-          <div className="inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-4 py-2 shadow-sm">
-            <span className="text-sm text-neutral-600">Total</span>
-            <span className="text-sm font-semibold text-neutral-900">
-              {eurFromCents(totalCents)} €
-            </span>
-          </div>
-        </header>
-
-        <div className="mt-8 grid grid-cols-1 gap-4 lg:grid-cols-[1fr,360px]">
-          <div className="space-y-3">
-            {rows.length === 0 ? (
-              <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
-                <p className="text-neutral-900 font-medium">Ton panier est vide.</p>
-                <p className="mt-1 text-neutral-600">
-                  Ajoute un article depuis la collection pour le retrouver ici.
-                </p>
-                <div className="mt-5 flex flex-wrap gap-3">
-                  <Link
-                    href="/collection"
-                    className="inline-flex h-11 items-center justify-center rounded-xl bg-neutral-900 px-5 text-sm font-semibold text-white hover:bg-black transition"
-                  >
-                    Découvrir la collection
-                  </Link>
-                </div>
-              </div>
-            ) : (
-              rows.map((item) => {
-                const unit = eurFromCents(item.pricecents);
-                const subtotal = eurFromCents(item.pricecents * item.quantity);
-                return (
-                  <article
-                    key={item.cartitemid}
-                    className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm"
-                  >
-                    <div className="grid grid-cols-1 sm:grid-cols-[140px,1fr]">
-                      <div className="bg-neutral-100">
-                        {item.imageurl ? (
-                          <img
-                            src={item.imageurl}
-                            alt={item.name}
-                            className="h-40 w-full object-cover sm:h-full"
-                            loading="lazy"
-                          />
-                        ) : (
-                          <div className="flex h-40 items-center justify-center text-sm text-neutral-500 sm:h-full">
-                            Pas d&apos;image
-                          </div>
-                        )}
-                      </div>
-                      <div className="p-4">
-                        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                          <div>
-                            <h3 className="text-base font-semibold text-neutral-900">
-                              {item.name}
-                            </h3>
-                            <p className="mt-1 text-sm text-neutral-600">
-                              Prix <span className="font-semibold text-neutral-900">{unit} €</span>
-                            </p>
-                            <p className="mt-1 text-sm text-neutral-600">
-                              Quantité{" "}
-                              <span className="font-semibold text-neutral-900">
-                                {item.quantity}
-                              </span>
-                            </p>
-                          </div>
-                          <div className="text-right">
-                            <div className="text-lg font-semibold text-neutral-900">
-                              {subtotal} €
-                            </div>
-                            <div className="text-xs text-neutral-500">Sous-total</div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </article>
-                );
-              })
-            )}
-          </div>
-
-          <aside className="lg:sticky lg:top-24">
-            <div className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
-              <h2 className="text-base font-semibold text-neutral-900">Récapitulatif</h2>
-              <div className="mt-4 space-y-2 text-sm">
-                <div className="flex items-center justify-between text-neutral-600">
-                  <span>Sous-total</span>
-                  <span className="font-semibold text-neutral-900">
-                    {eurFromCents(totalCents)} €
-                  </span>
-                </div>
-              </div>
-              <div className="my-4 h-px w-full bg-neutral-200" />
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-neutral-900">Total</span>
-                <span className="text-lg font-semibold text-neutral-900">
-                  {eurFromCents(totalCents)} €
-                </span>
-              </div>
-              <button
-                disabled
-                className="mt-4 h-11 w-full rounded-xl bg-neutral-900 text-sm font-semibold text-white opacity-60"
-              >
-                Passer au paiement
-              </button>
-            </div>
-          </aside>
-        </div>
-      </section>
-    </main>
-  );
+  // Toute l'UI + actions (+ / - / supprimer) passe dans le composant client
+  return <CartClient initialItems={rows} userFullName={user.full_name} />;
 }

@@ -26,13 +26,19 @@ export async function POST(req: Request) {
     const productId = Number(body?.productId);
     if (!productId) return NextResponse.json({ error: "INVALID_PRODUCT" }, { status: 400 });
 
+    const [prows] = await pool.query<RowDataPacket[]>(
+      "SELECT 1 FROM products WHERE id = ? LIMIT 1",
+      [productId]
+    );
+    if (!prows.length) return NextResponse.json({ error: "INVALID_PRODUCT" }, { status: 400 });
+
     const [rows] = await pool.query<ExistingRow[]>(
       "SELECT id FROM wishlist_items WHERE user_id = ? AND product_id = ? LIMIT 1",
       [user.id, productId]
     );
 
     if (rows.length) {
-      await pool.query("DELETE FROM wishlist_items WHERE id = ?", [rows[0].id]);
+      await pool.query("DELETE FROM wishlist_items WHERE id = ? AND user_id = ?", [rows[0].id, user.id]);
       return NextResponse.json({ ok: true, wished: false });
     }
 
