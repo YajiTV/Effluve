@@ -74,7 +74,7 @@ export default async function HommePage() {
             </Link>
 
             <Link
-              href="/wishlist"
+              href="/account/wishlist"
               className="inline-flex h-11 items-center justify-center rounded-xl border border-neutral-300 bg-white px-5 text-sm font-semibold text-neutral-900 hover:border-neutral-400 transition"
             >
               Mes favoris

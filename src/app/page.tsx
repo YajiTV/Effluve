@@ -1,5 +1,7 @@
 // app/page.tsx
 import Link from "next/link";
+import SearchBar from "@/components/HeaderSearch";
+
 
 export const dynamic = "force-dynamic";
 
@@ -46,7 +48,7 @@ export default function HomePage() {
           L’élégance moderne, minimaliste et durable. Découvrez une collection pensée pour durer,
           avec des matières sélectionnées et une coupe essentielle.
         </p>
-
+        
         {/* CTA */}
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
           <Link

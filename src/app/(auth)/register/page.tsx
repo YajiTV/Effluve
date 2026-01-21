@@ -17,7 +17,7 @@ export default function RegisterPage() {
     setLoading(true);
     setError(null);
 
-    const res = await fetch('/api/auth/register', {
+    const res = await fetch('/angora/api/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ full_name, email, password }),

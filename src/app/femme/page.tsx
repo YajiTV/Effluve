@@ -33,7 +33,7 @@ export default async function FemmePage() {
     category,
     isactive   AS is_active
   FROM products
-  WHERE category = 'homme' AND isactive = 1
+  WHERE category = 'femme' AND isactive = 1
   ORDER BY id DESC
   `
 );
@@ -73,7 +73,7 @@ export default async function FemmePage() {
             </Link>
 
             <Link
-              href="/wishlist"
+              href="/account/wishlist"
               className="inline-flex h-11 items-center justify-center rounded-xl border border-neutral-300 bg-white px-5 text-sm font-semibold text-neutral-900 hover:border-neutral-400 transition"
             >
               Mes favoris
@@ -102,17 +102,14 @@ export default async function FemmePage() {
                 key={p.id}
                 className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm hover:shadow-md transition"
               >
-                <div className="aspect-4/5 w-full bg-neutral-100">
+                <div className="aspect-[4/5] w-full bg-neutral-100">
                   {p.image_url ? (
-                    <div className="relative h-full w-full">
-                      <Image
-                        src={p.image_url}
-                        alt={p.name}
-                        fill
-                        className="object-cover"
-                        sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                      />
-                    </div>
+                    <img
+                      src={p.image_url}
+                      alt={p.name}
+                      className="h-full w-full object-cover"
+                      loading="lazy"
+                    />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center text-sm text-neutral-500">
                       Pas d’image
