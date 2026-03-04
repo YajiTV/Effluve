@@ -1,11 +1,11 @@
 # EFFLUVE
 
-Boutique e-commerce Next.js 16 (App Router) connectée à MySQL (InnoDB) via `mysql2`.
+Boutique e-commerce Next.js 16 (App Router) connectée à MySQL (InnoDB) via Prisma ORM.
 
 ## Prérequis
 
 - Node.js 20+
-- MySQL (phpMyAdmin recommandé pour l'administration)
+- MySQL
 - Une base `effluve` avec tables applicatives (`users`, `products`, `cart_items`, `wishlist_items`, `addresses`, `orders`, `order_items`)
 
 ## Configuration
@@ -13,11 +13,7 @@ Boutique e-commerce Next.js 16 (App Router) connectée à MySQL (InnoDB) via `my
 Renseigne `.env` :
 
 ```env
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_USER=effluve
-DB_PASSWORD=effluve
-DB_NAME=effluve
+DATABASE_URL="mysql://effluve:effluve@127.0.0.1:3306/effluve"
 AUTH_SECRET=change_me
 NEXT_PUBLIC_API_URL=http://localhost:3000/api
 ```
@@ -26,6 +22,7 @@ NEXT_PUBLIC_API_URL=http://localhost:3000/api
 
 ```bash
 npm install
+npm run prisma:generate
 npm run dev
 ```
 

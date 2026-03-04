@@ -1,9 +1,6 @@
-// src/app/api/wishlist/[id]/route.ts
 import { NextResponse } from "next/server";
-import type { ResultSetHeader } from "mysql2/promise";
-
-import { pool } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 
 type Context = { params: Promise<{ id: string }> };
 
@@ -21,12 +18,11 @@ export async function DELETE(_req: Request, { params }: Context) {
       return NextResponse.json({ error: "INVALID_ID" }, { status: 400 });
     }
 
-    const [result] = await pool.query<ResultSetHeader>(
-      "DELETE FROM wishlist_items WHERE id = ? AND user_id = ?",
-      [wishlistId, user.id]
-    );
+    const result = await prisma.wishlistItem.deleteMany({
+      where: { id: wishlistId, userId: user.id },
+    });
 
-    if (result.affectedRows === 0) {
+    if (result.count === 0) {
       return NextResponse.json(
         { error: "NOT_FOUND", message: "Article introuvable dans tes favoris." },
         { status: 404 }

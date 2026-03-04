@@ -1,16 +1,12 @@
-// src/app/api/cart/add/route.ts
 import { NextResponse } from "next/server";
-import { pool } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth";
-import type { RowDataPacket } from "mysql2/promise";
+import { prisma } from "@/lib/prisma";
 
 function errorMessage(err: unknown): string {
   if (err instanceof Error) return err.message;
   if (typeof err === "object" && err !== null) {
     const rec = err as Record<string, unknown>;
-    const sqlMessage = rec["sqlMessage"];
     const message = rec["message"];
-    if (typeof sqlMessage === "string") return sqlMessage;
     if (typeof message === "string") return message;
   }
   return "Erreur serveur";
@@ -25,21 +21,14 @@ export async function POST(req: Request) {
     const productId = Number(body?.productId);
     if (!productId) return NextResponse.json({ error: "INVALID_PRODUCT" }, { status: 400 });
 
-    // Optionnel mais propre : vérifier que le produit existe
-    const [prows] = await pool.query<RowDataPacket[]>(
-      "SELECT 1 FROM products WHERE id = ? LIMIT 1",
-      [productId]
-    );
-    if (!prows.length) return NextResponse.json({ error: "INVALID_PRODUCT" }, { status: 400 });
+    const product = await prisma.product.findUnique({ where: { id: productId }, select: { id: true } });
+    if (!product) return NextResponse.json({ error: "INVALID_PRODUCT" }, { status: 400 });
 
-    await pool.query(
-      `
-      INSERT INTO cart_items (user_id, product_id, quantity)
-      VALUES (?, ?, 1)
-      ON DUPLICATE KEY UPDATE quantity = quantity + 1
-      `,
-      [user.id, productId]
-    );
+    await prisma.cartItem.upsert({
+      where: { userId_productId: { userId: user.id, productId } },
+      create: { userId: user.id, productId, quantity: 1 },
+      update: { quantity: { increment: 1 } },
+    });
 
     return NextResponse.json({ ok: true });
   } catch (err: unknown) {

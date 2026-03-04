@@ -1,5 +1,5 @@
-import type { RowDataPacket } from "mysql2/promise";
-import { pool } from "@/lib/db";
+import type { ProductCategory } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 
 export type Product = {
   id: number;
@@ -11,88 +11,59 @@ export type Product = {
   isActive: 0 | 1;
 };
 
-type ProductRow = RowDataPacket & Product;
-
-function toProduct(row: ProductRow): Product {
+function toProduct(row: {
+  id: number;
+  name: string;
+  description: string | null;
+  priceCents: number;
+  imageUrl: string | null;
+  category: ProductCategory;
+  isActive: boolean;
+}): Product {
   return {
-    id: Number(row.id),
-    name: String(row.name),
+    id: row.id,
+    name: row.name,
     description: row.description ?? null,
-    priceCents: Number(row.priceCents),
+    priceCents: row.priceCents,
     imageUrl: row.imageUrl ?? null,
-    category: row.category,
-    isActive: row.isActive,
+    category: row.category as Product["category"],
+    isActive: row.isActive ? 1 : 0,
   };
 }
 
 export async function getProductsByCategory(category: "homme" | "femme") {
-  const [rows] = await pool.query<ProductRow[]>(
-    `
-    SELECT
-      id,
-      name,
-      description,
-      pricecents AS priceCents,
-      imageurl   AS imageUrl,
-      category,
-      isactive   AS isActive
-    FROM products
-    WHERE category = ? AND isactive = 1
-    ORDER BY id DESC
-    `,
-    [category]
-  );
+  const rows = await prisma.product.findMany({
+    where: { category, isActive: true },
+    orderBy: { id: "desc" },
+  });
 
   return rows.map(toProduct);
 }
 
 export async function getProductsByCategories(categories: ("homme" | "femme")[]) {
-  const [rows] = await pool.query<ProductRow[]>(
-    `
-    SELECT
-      id,
-      name,
-      description,
-      pricecents AS priceCents,
-      imageurl   AS imageUrl,
-      category,
-      isactive   AS isActive
-    FROM products
-    WHERE category IN (${categories.map(() => "?").join(",")}) AND isactive = 1
-    ORDER BY category ASC, id DESC
-    `,
-    categories
-  );
+  const rows = await prisma.product.findMany({
+    where: { category: { in: categories }, isActive: true },
+    orderBy: [{ category: "asc" }, { id: "desc" }],
+  });
 
   return rows.map(toProduct);
 }
 
 export async function searchProducts(query: string, limit = 48) {
   const safeQuery = String(query ?? "").trim();
-  const like = `%${safeQuery}%`;
-
-  const [rows] = await pool.query<ProductRow[]>(
-    `
-    SELECT
-      id,
-      name,
-      description,
-      pricecents AS priceCents,
-      imageurl   AS imageUrl,
-      category,
-      isactive   AS isActive
-    FROM products
-    WHERE isactive = 1
-      AND (
-        ? = '' OR
-        name LIKE ? OR
-        description LIKE ?
-      )
-    ORDER BY id DESC
-    LIMIT ${Number(limit)}
-    `,
-    [safeQuery, like, like]
-  );
+  const rows = await prisma.product.findMany({
+    where: safeQuery
+      ? {
+          isActive: true,
+          OR: [
+            { name: { contains: safeQuery } },
+            { description: { contains: safeQuery } },
+          ],
+        }
+      : { isActive: true },
+    orderBy: { id: "desc" },
+    take: Number(limit),
+  });
 
   return rows.map(toProduct);
 }

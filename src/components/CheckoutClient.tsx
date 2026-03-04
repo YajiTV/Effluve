@@ -56,6 +56,7 @@ export default function CheckoutClient({
   const [billingAddressId, setBillingAddressId] = useState(defaultAddressId(addresses, "billing"));
   const [creating, setCreating] = useState(false);
   const [paying, setPaying] = useState(false);
+  const [stripePaying, setStripePaying] = useState(false);
   const [cancelling, setCancelling] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [createdOrder, setCreatedOrder] = useState<CreatedOrder | null>(null);
@@ -111,6 +112,33 @@ export default function CheckoutClient({
     setPaymentStatus("paid");
     router.push(`/account/orders/${createdOrder.orderId}`);
     router.refresh();
+  };
+
+  const payWithStripeTest = async () => {
+    if (!createdOrder) return;
+    setError(null);
+    setStripePaying(true);
+
+    const res = await fetch("/api/payment/stripe/session", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ orderId: createdOrder.orderId }),
+    }).catch(() => null);
+
+    setStripePaying(false);
+
+    if (!res?.ok) {
+      setError("Session Stripe test indisponible.");
+      return;
+    }
+
+    const data = (await res.json()) as { url?: string };
+    if (!data.url) {
+      setError("URL Stripe invalide.");
+      return;
+    }
+
+    window.location.href = data.url;
   };
 
   const cancel = async () => {
@@ -221,11 +249,19 @@ export default function CheckoutClient({
 
             <div className="mt-4 flex flex-wrap gap-3">
               <button
+                onClick={payWithStripeTest}
+                disabled={stripePaying || paymentStatus !== "pending_payment"}
+                className="inline-flex h-10 items-center justify-center rounded-xl bg-indigo-600 px-4 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-60"
+              >
+                {stripePaying ? "Redirection Stripe..." : "Payer avec Stripe (test)"}
+              </button>
+
+              <button
                 onClick={pay}
                 disabled={paying || paymentStatus !== "pending_payment"}
                 className="inline-flex h-10 items-center justify-center rounded-xl bg-neutral-900 px-4 text-sm font-semibold text-white hover:bg-black disabled:opacity-60"
               >
-                {paying ? "Paiement..." : "Payer"}
+                {paying ? "Paiement..." : "Paiement simulé"}
               </button>
 
               <button

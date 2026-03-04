@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { User, Package, MapPin, Heart } from 'lucide-react';
+import { User, Package, MapPin, Heart, RotateCcw, Shield } from 'lucide-react';
 import { getSessionUser } from '@/lib/auth';
 import LogoutButton from '@/components/LogoutButton';
 
@@ -34,6 +34,11 @@ export default async function AccountPage() {
                 <Package className="w-5 h-5" strokeWidth={1.5} />
                 Mes commandes
               </Link>
+              
+              <Link href="/account/invoices" className="flex items-center gap-3 px-4 py-3 font-body text-sm text-neutral-700 hover:bg-neutral-50 rounded transition-colors">
+                <Package className="w-5 h-5" strokeWidth={1.5} />
+                Mes factures
+              </Link>
 
               <Link href="/account/address" className="flex items-center gap-3 px-4 py-3 font-body text-sm text-neutral-700 hover:bg-neutral-50 rounded transition-colors">
                 <MapPin className="w-5 h-5" strokeWidth={1.5} />
@@ -44,6 +49,18 @@ export default async function AccountPage() {
                 <Heart className="w-5 h-5" strokeWidth={1.5} />
                 Liste de souhaits
               </Link>
+
+              <Link href="/account/returns" className="flex items-center gap-3 px-4 py-3 font-body text-sm text-neutral-700 hover:bg-neutral-50 rounded transition-colors">
+                <RotateCcw className="w-5 h-5" strokeWidth={1.5} />
+                Mes retours
+              </Link>
+
+              {user.role === 'admin' && (
+                <Link href="/admin/returns" className="flex items-center gap-3 px-4 py-3 font-body text-sm text-neutral-700 hover:bg-neutral-50 rounded transition-colors">
+                  <Shield className="w-5 h-5" strokeWidth={1.5} />
+                  Dashboard admin
+                </Link>
+              )}
 
               <LogoutButton />
             </nav>

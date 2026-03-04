@@ -1,6 +1,4 @@
-import type { PoolConnection, ResultSetHeader, RowDataPacket } from "mysql2/promise";
-import { pool } from "@/lib/db";
-import { getCartItemsByUserId } from "@/lib/cart";
+import { prisma } from "@/lib/prisma";
 
 export type OrderStatus = "pending_payment" | "paid" | "cancelled";
 
@@ -10,14 +8,6 @@ export type OrderSummary = {
   createdAt: string;
   totalCents: number;
   paymentStatus: OrderStatus;
-};
-
-type OrderRow = RowDataPacket & {
-  id: number;
-  order_number: string;
-  created_at: string;
-  total_cents: number;
-  payment_status: OrderStatus;
 };
 
 export type OrderDetail = {
@@ -38,195 +28,165 @@ export type OrderDetail = {
   }[];
 };
 
-type OrderDetailRow = RowDataPacket & {
+export type PaidOrderForReturn = {
   id: number;
-  order_number: string;
-  created_at: string;
-  total_cents: number;
-  payment_status: OrderStatus;
-  shipping_address_id: number;
-  billing_address_id: number;
-};
-
-type OrderItemRow = RowDataPacket & {
-  id: number;
-  product_id: number;
-  product_name: string;
-  unit_price_cents: number;
-  quantity: number;
-  line_total_cents: number;
+  orderNumber: string;
+  items: {
+    id: number;
+    productName: string;
+  }[];
 };
 
 function makeOrderNumber(userId: number) {
   const stamp = Date.now().toString(36).toUpperCase();
-  return `EFF-${userId}-${stamp}`;
+  return `CMD-${userId}-${stamp}`;
 }
 
-// Crée une commande à partir du panier utilisateur et vide le panier dans la même transaction.
 export async function createOrderFromCart(params: {
   userId: number;
   shippingAddressId: number;
   billingAddressId: number;
 }) {
   const { userId, shippingAddressId, billingAddressId } = params;
-  const cartItems = await getCartItemsByUserId(userId);
-  if (!cartItems.length) {
-    throw new Error("PANIER_VIDE");
-  }
-
-  const totalCents = cartItems.reduce((sum, row) => sum + row.pricecents * row.quantity, 0);
   const orderNumber = makeOrderNumber(userId);
 
-  const connection = await pool.getConnection();
-  try {
-    await connection.beginTransaction();
+  return prisma.$transaction(async (tx) => {
+    const cartItems = await tx.cartItem.findMany({
+      where: { userId },
+      include: { product: true },
+      orderBy: { id: "desc" },
+    });
 
-    await assertAddressOwnership(connection, userId, shippingAddressId);
-    await assertAddressOwnership(connection, userId, billingAddressId);
-
-    const [orderResult] = await connection.query<ResultSetHeader>(
-      `
-      INSERT INTO orders (
-        user_id,
-        order_number,
-        total_cents,
-        payment_status,
-        shipping_address_id,
-        billing_address_id
-      ) VALUES (?, ?, ?, 'pending_payment', ?, ?)
-      `,
-      [userId, orderNumber, totalCents, shippingAddressId, billingAddressId]
-    );
-
-    const orderId = Number(orderResult.insertId);
-
-    for (const item of cartItems) {
-      const lineTotalCents = item.pricecents * item.quantity;
-      await connection.query(
-        `
-        INSERT INTO order_items (
-          order_id,
-          product_id,
-          product_name,
-          unit_price_cents,
-          quantity,
-          line_total_cents
-        ) VALUES (?, ?, ?, ?, ?, ?)
-        `,
-        [orderId, item.productid, item.name, item.pricecents, item.quantity, lineTotalCents]
-      );
+    if (!cartItems.length) {
+      throw new Error("PANIER_VIDE");
     }
 
-    await connection.query("DELETE FROM cart_items WHERE user_id = ?", [userId]);
-    await connection.commit();
+    const [shippingAddress, billingAddress] = await Promise.all([
+      tx.address.findFirst({ where: { id: shippingAddressId, userId }, select: { id: true } }),
+      tx.address.findFirst({ where: { id: billingAddressId, userId }, select: { id: true } }),
+    ]);
 
-    return { orderId, orderNumber, totalCents, paymentStatus: "pending_payment" as const };
-  } catch (error) {
-    await connection.rollback();
-    throw error;
-  } finally {
-    connection.release();
-  }
+    if (!shippingAddress || !billingAddress) {
+      throw new Error("ADRESSE_INVALIDE");
+    }
+
+    const totalCents = cartItems.reduce((sum, row) => sum + row.product.priceCents * row.quantity, 0);
+
+    const order = await tx.order.create({
+      data: {
+        userId,
+        orderNumber,
+        totalCents,
+        paymentStatus: "pending_payment",
+        shippingAddressId,
+        billingAddressId,
+      },
+    });
+
+    await tx.orderItem.createMany({
+      data: cartItems.map((item) => ({
+        orderId: order.id,
+        productId: item.productId,
+        productName: item.product.name,
+        unitPriceCents: item.product.priceCents,
+        quantity: item.quantity,
+        lineTotalCents: item.product.priceCents * item.quantity,
+      })),
+    });
+
+    await tx.cartItem.deleteMany({ where: { userId } });
+
+    return { orderId: order.id, orderNumber: order.orderNumber, totalCents, paymentStatus: "pending_payment" as const };
+  });
 }
 
-// Simule un paiement validé en basculant l'état de la commande vers "paid".
 export async function markOrderAsPaid(userId: number, orderId: number) {
-  const [result] = await pool.query<ResultSetHeader>(
-    `
-    UPDATE orders
-    SET payment_status = 'paid', updated_at = NOW()
-    WHERE id = ? AND user_id = ? AND payment_status = 'pending_payment'
-    `,
-    [orderId, userId]
-  );
-
-  return result.affectedRows > 0;
+  const result = await prisma.order.updateMany({
+    where: { id: orderId, userId, paymentStatus: "pending_payment" },
+    data: { paymentStatus: "paid" },
+  });
+  return result.count > 0;
 }
 
-// Simule une annulation de paiement pour garder un état métier explicite.
 export async function markOrderAsCancelled(userId: number, orderId: number) {
-  const [result] = await pool.query<ResultSetHeader>(
-    `
-    UPDATE orders
-    SET payment_status = 'cancelled', updated_at = NOW()
-    WHERE id = ? AND user_id = ? AND payment_status != 'paid'
-    `,
-    [orderId, userId]
-  );
-
-  return result.affectedRows > 0;
+  const result = await prisma.order.updateMany({
+    where: { id: orderId, userId, paymentStatus: { not: "paid" } },
+    data: { paymentStatus: "cancelled" },
+  });
+  return result.count > 0;
 }
 
 export async function getOrdersByUserId(userId: number): Promise<OrderSummary[]> {
-  const [rows] = await pool.query<OrderRow[]>(
-    `
-    SELECT id, order_number, created_at, total_cents, payment_status
-    FROM orders
-    WHERE user_id = ?
-    ORDER BY created_at DESC, id DESC
-    `,
-    [userId]
-  );
+  const rows = await prisma.order.findMany({
+    where: { userId },
+    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+    select: {
+      id: true,
+      orderNumber: true,
+      createdAt: true,
+      totalCents: true,
+      paymentStatus: true,
+    },
+  });
 
   return rows.map((row) => ({
-    id: Number(row.id),
-    orderNumber: String(row.order_number),
-    createdAt: String(row.created_at),
-    totalCents: Number(row.total_cents),
-    paymentStatus: row.payment_status,
+    id: row.id,
+    orderNumber: row.orderNumber,
+    createdAt: row.createdAt.toISOString(),
+    totalCents: row.totalCents,
+    paymentStatus: row.paymentStatus,
   }));
 }
 
 export async function getOrderDetailById(userId: number, orderId: number): Promise<OrderDetail | null> {
-  const [orders] = await pool.query<OrderDetailRow[]>(
-    `
-    SELECT id, order_number, created_at, total_cents, payment_status, shipping_address_id, billing_address_id
-    FROM orders
-    WHERE id = ? AND user_id = ?
-    LIMIT 1
-    `,
-    [orderId, userId]
-  );
+  const row = await prisma.order.findFirst({
+    where: { id: orderId, userId },
+    include: {
+      items: { orderBy: { id: "asc" } },
+    },
+  });
 
-  if (!orders.length) return null;
+  if (!row) return null;
 
-  const [items] = await pool.query<OrderItemRow[]>(
-    `
-    SELECT id, product_id, product_name, unit_price_cents, quantity, line_total_cents
-    FROM order_items
-    WHERE order_id = ?
-    ORDER BY id ASC
-    `,
-    [orderId]
-  );
-
-  const order = orders[0];
   return {
-    id: Number(order.id),
-    orderNumber: String(order.order_number),
-    createdAt: String(order.created_at),
-    totalCents: Number(order.total_cents),
-    paymentStatus: order.payment_status,
-    shippingAddressId: Number(order.shipping_address_id),
-    billingAddressId: Number(order.billing_address_id),
-    items: items.map((item) => ({
-      id: Number(item.id),
-      productId: Number(item.product_id),
-      productName: String(item.product_name),
-      unitPriceCents: Number(item.unit_price_cents),
-      quantity: Number(item.quantity),
-      lineTotalCents: Number(item.line_total_cents),
+    id: row.id,
+    orderNumber: row.orderNumber,
+    createdAt: row.createdAt.toISOString(),
+    totalCents: row.totalCents,
+    paymentStatus: row.paymentStatus,
+    shippingAddressId: row.shippingAddressId,
+    billingAddressId: row.billingAddressId,
+    items: row.items.map((item) => ({
+      id: item.id,
+      productId: item.productId,
+      productName: item.productName,
+      unitPriceCents: item.unitPriceCents,
+      quantity: item.quantity,
+      lineTotalCents: item.lineTotalCents,
     })),
   };
 }
 
-async function assertAddressOwnership(connection: PoolConnection, userId: number, addressId: number) {
-  const [rows] = await connection.query<RowDataPacket[]>(
-    "SELECT id FROM addresses WHERE id = ? AND user_id = ? LIMIT 1",
-    [addressId, userId]
-  );
+export async function getPaidOrdersWithItemsByUserId(userId: number): Promise<PaidOrderForReturn[]> {
+  const rows = await prisma.order.findMany({
+    where: { userId, paymentStatus: "paid" },
+    select: {
+      id: true,
+      orderNumber: true,
+      items: {
+        select: { id: true, productName: true },
+        orderBy: { id: "asc" },
+      },
+    },
+    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+  });
 
-  if (!rows.length) {
-    throw new Error("ADRESSE_INVALIDE");
-  }
+  return rows.map((row) => ({
+    id: row.id,
+    orderNumber: row.orderNumber,
+    items: row.items.map((item) => ({
+      id: item.id,
+      productName: item.productName,
+    })),
+  }));
 }

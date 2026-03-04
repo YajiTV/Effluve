@@ -1,8 +1,7 @@
 // src/lib/auth.ts
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
-import type { RowDataPacket } from "mysql2/promise";
-import { pool } from "@/lib/db";
+import { prisma } from "@/lib/prisma";
 
 export type SessionUser = {
   id: number;
@@ -51,18 +50,17 @@ export async function getSessionUser(): Promise<SessionUser | null> {
   const id = await verifySessionId(token);
   if (!id) return null;
 
-  // On valide l’existence en DB pour éviter les FK errors (session stale).
-  const [rows] = await pool.query<(RowDataPacket & SessionUser)[]>(
-    "SELECT id, email, full_name, role FROM users WHERE id = ? LIMIT 1",
-    [id]
-  );
+  const row = await prisma.user.findUnique({
+    where: { id },
+    select: { id: true, email: true, fullName: true, role: true },
+  });
+  if (!row) return null;
 
-  if (!rows.length) return null;
   return {
-    id: Number(rows[0].id),
-    email: String(rows[0].email),
-    full_name: String(rows[0].full_name),
-    role: (rows[0].role as SessionUser["role"]) ?? "customer",
+    id: row.id,
+    email: row.email,
+    full_name: row.fullName,
+    role: row.role,
   };
 }
 

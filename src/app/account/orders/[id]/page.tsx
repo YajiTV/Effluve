@@ -63,6 +63,17 @@ export default async function OrderDetailPage({ params }: Params) {
             <p className="font-semibold text-neutral-900">Total</p>
             <p className="font-semibold text-neutral-900">{eurFromCents(order.totalCents)} €</p>
           </div>
+
+          {order.paymentStatus === "paid" ? (
+            <div className="mt-5">
+              <Link
+                href="/account/returns"
+                className="text-sm font-semibold text-neutral-900 underline underline-offset-4"
+              >
+                Demander un retour
+              </Link>
+            </div>
+          ) : null}
         </section>
       </div>
     </main>

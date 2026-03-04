@@ -1,17 +1,12 @@
 import { NextResponse } from "next/server";
-import { pool } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth";
-import type { RowDataPacket } from "mysql2/promise";
-
-type ExistingRow = RowDataPacket & { id: number };
+import { prisma } from "@/lib/prisma";
 
 function errorMessage(err: unknown): string {
   if (err instanceof Error) return err.message;
   if (typeof err === "object" && err !== null) {
     const rec = err as Record<string, unknown>;
-    const sqlMessage = rec["sqlMessage"];
     const message = rec["message"];
-    if (typeof sqlMessage === "string") return sqlMessage;
     if (typeof message === "string") return message;
   }
   return "Erreur serveur";
@@ -26,26 +21,22 @@ export async function POST(req: Request) {
     const productId = Number(body?.productId);
     if (!productId) return NextResponse.json({ error: "INVALID_PRODUCT" }, { status: 400 });
 
-    const [prows] = await pool.query<RowDataPacket[]>(
-      "SELECT 1 FROM products WHERE id = ? LIMIT 1",
-      [productId]
-    );
-    if (!prows.length) return NextResponse.json({ error: "INVALID_PRODUCT" }, { status: 400 });
+    const product = await prisma.product.findUnique({ where: { id: productId }, select: { id: true } });
+    if (!product) return NextResponse.json({ error: "INVALID_PRODUCT" }, { status: 400 });
 
-    const [rows] = await pool.query<ExistingRow[]>(
-      "SELECT id FROM wishlist_items WHERE user_id = ? AND product_id = ? LIMIT 1",
-      [user.id, productId]
-    );
+    const existing = await prisma.wishlistItem.findUnique({
+      where: { userId_productId: { userId: user.id, productId } },
+      select: { id: true },
+    });
 
-    if (rows.length) {
-      await pool.query("DELETE FROM wishlist_items WHERE id = ? AND user_id = ?", [rows[0].id, user.id]);
+    if (existing) {
+      await prisma.wishlistItem.delete({ where: { id: existing.id } });
       return NextResponse.json({ ok: true, wished: false });
     }
 
-    await pool.query(
-      "INSERT INTO wishlist_items (user_id, product_id) VALUES (?, ?)",
-      [user.id, productId]
-    );
+    await prisma.wishlistItem.create({
+      data: { userId: user.id, productId },
+    });
 
     return NextResponse.json({ ok: true, wished: true });
   } catch (err: unknown) {

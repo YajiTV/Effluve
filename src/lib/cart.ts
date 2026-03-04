@@ -1,5 +1,4 @@
-import type { RowDataPacket } from "mysql2/promise";
-import { pool } from "@/lib/db";
+import { prisma } from "@/lib/prisma";
 
 export type CartItem = {
   cartitemid: number;
@@ -10,33 +9,20 @@ export type CartItem = {
   imageurl: string | null;
 };
 
-type CartRow = RowDataPacket & CartItem;
-
 export async function getCartItemsByUserId(userId: number): Promise<CartItem[]> {
-  const [rows] = await pool.query<CartRow[]>(
-    `
-    SELECT
-      ci.id        AS cartitemid,
-      ci.quantity  AS quantity,
-      p.id         AS productid,
-      p.name       AS name,
-      p.pricecents AS pricecents,
-      p.imageurl   AS imageurl
-    FROM cart_items ci
-    JOIN products p ON p.id = ci.product_id
-    WHERE ci.user_id = ?
-    ORDER BY ci.id DESC
-    `,
-    [userId]
-  );
+  const rows = await prisma.cartItem.findMany({
+    where: { userId },
+    include: { product: true },
+    orderBy: { id: "desc" },
+  });
 
   return rows.map((row) => ({
-    cartitemid: Number(row.cartitemid),
-    quantity: Number(row.quantity),
-    productid: Number(row.productid),
-    name: String(row.name),
-    pricecents: Number(row.pricecents),
-    imageurl: row.imageurl ?? null,
+    cartitemid: row.id,
+    quantity: row.quantity,
+    productid: row.product.id,
+    name: row.product.name,
+    pricecents: row.product.priceCents,
+    imageurl: row.product.imageUrl ?? null,
   }));
 }
 
