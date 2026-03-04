@@ -35,7 +35,7 @@ export default async function AccountPage() {
                 Mes commandes
               </Link>
 
-              <Link href="/account/addresses" className="flex items-center gap-3 px-4 py-3 font-body text-sm text-neutral-700 hover:bg-neutral-50 rounded transition-colors">
+              <Link href="/account/address" className="flex items-center gap-3 px-4 py-3 font-body text-sm text-neutral-700 hover:bg-neutral-50 rounded transition-colors">
                 <MapPin className="w-5 h-5" strokeWidth={1.5} />
                 Mes adresses
               </Link>

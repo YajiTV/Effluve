@@ -16,6 +16,10 @@ function eurFromCents(cents: number) {
   return (Number(cents) / 100).toFixed(2);
 }
 
+function bumpCounts() {
+  window.dispatchEvent(new Event("effluve:counts"));
+}
+
 async function reloadCart(): Promise<CartItem[]> {
   const res = await fetch("/api/cart", { cache: "no-store" });
   if (!res.ok) return [];
@@ -44,6 +48,7 @@ export default function CartClient({
       body: JSON.stringify({ productId }),
     });
     setItems(await reloadCart());
+    bumpCounts();
   };
 
   const setQty = async (cartItemId: number, quantity: number) => {
@@ -53,6 +58,7 @@ export default function CartClient({
       body: JSON.stringify({ cartItemId, quantity }),
     });
     setItems(await reloadCart());
+    bumpCounts();
   };
 
   const removeItem = async (cartItemId: number) => {
@@ -62,6 +68,7 @@ export default function CartClient({
       body: JSON.stringify({ cartItemId }),
     });
     setItems(await reloadCart());
+    bumpCounts();
   };
 
   return (
@@ -227,12 +234,17 @@ export default function CartClient({
                 <span className="text-lg font-semibold text-neutral-900">{eurFromCents(totalCents)} €</span>
               </div>
 
-              <button
-                disabled
-                className="mt-4 h-11 w-full rounded-xl bg-neutral-900 text-sm font-semibold text-white opacity-60"
+              <Link
+                href="/checkout"
+                className={[
+                  "mt-4 inline-flex h-11 w-full items-center justify-center rounded-xl text-sm font-semibold",
+                  items.length
+                    ? "bg-neutral-900 text-white hover:bg-black transition"
+                    : "pointer-events-none bg-neutral-300 text-neutral-500",
+                ].join(" ")}
               >
-                Passer au paiement
-              </button>
+                Passer à la validation
+              </Link>
             </div>
           </aside>
         </div>

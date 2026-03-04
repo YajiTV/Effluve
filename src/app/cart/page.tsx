@@ -1,20 +1,9 @@
-// src/app/cart/page.tsx
 import Link from "next/link";
-import { pool } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth";
-import type { RowDataPacket } from "mysql2/promise";
 import CartClient from "@/components/CartClient";
+import { getCartItemsByUserId } from "@/lib/cart";
 
 export const dynamic = "force-dynamic";
-
-type CartRow = RowDataPacket & {
-  cartitemid: number;
-  quantity: number;
-  productid: number;
-  name: string;
-  pricecents: number;
-  imageurl: string | null;
-};
 
 function GuestGate() {
   return (
@@ -64,23 +53,6 @@ export default async function CartPage() {
   const user = await getSessionUser();
   if (!user) return <GuestGate />;
 
-  const [rows] = await pool.query<CartRow[]>(
-    `
-    SELECT
-      ci.id        AS cartitemid,
-      ci.quantity  AS quantity,
-      p.id         AS productid,
-      p.name       AS name,
-      p.pricecents AS pricecents,
-      p.imageurl   AS imageurl
-    FROM cart_items ci
-    JOIN products p ON p.id = ci.product_id
-    WHERE ci.user_id = ?
-    ORDER BY ci.id DESC
-    `,
-    [user.id]
-  );
-
-  // Toute l'UI + actions (+ / - / supprimer) passe dans le composant client
-  return <CartClient initialItems={rows} userFullName={user.full_name} />;
+  const items = await getCartItemsByUserId(user.id);
+  return <CartClient initialItems={items} userFullName={user.full_name} />;
 }

@@ -40,27 +40,27 @@ export default function CartToast({
       ? "text-green-700"
       : variant === "danger"
         ? "text-red-700"
-        : "text-angora-nero";
+        : "text-effluve-nero";
 
   const iconBg =
     variant === "success"
       ? "bg-green-100"
       : variant === "danger"
         ? "bg-red-100"
-        : "bg-angora-vanilla/20";
+        : "bg-effluve-vanilla/20";
 
   const iconColor =
     variant === "success"
       ? "text-green-700"
       : variant === "danger"
         ? "text-red-700"
-        : "text-angora-nero";
+        : "text-effluve-nero";
 
   return (
     <div className="fixed top-24 right-6 z-[100]">
       <div
         className={[
-          "bg-angora-white border border-angora-vanilla shadow-2xl p-6 max-w-sm flex items-start gap-4",
+          "bg-effluve-white border border-effluve-vanilla shadow-2xl p-6 max-w-sm flex items-start gap-4",
           closing ? "animate-cart-toast-out" : "animate-cart-toast-in",
         ].join(" ")}
         role="status"
@@ -69,10 +69,10 @@ export default function CartToast({
         {/* Croix à gauche */}
         <button
           onClick={close}
-          className="shrink-0 -ml-1 -mt-1 p-1 hover:bg-angora-vanilla/20 rounded-full transition-colors"
+          className="shrink-0 -ml-1 -mt-1 p-1 hover:bg-effluve-vanilla/20 rounded-full transition-colors"
           aria-label="Fermer la notification"
         >
-          <X className="w-4 h-4 text-angora-nero" strokeWidth={1.5} />
+          <X className="w-4 h-4 text-effluve-nero" strokeWidth={1.5} />
         </button>
 
         <div
@@ -85,7 +85,7 @@ export default function CartToast({
           <p className={`font-body text-xs uppercase tracking-[0.15em] ${pill} mb-1`}>
             {title}
           </p>
-          <p className="font-body text-sm text-angora-black">{message}</p>
+          <p className="font-body text-sm text-effluve-black">{message}</p>
         </div>
       </div>
     </div>

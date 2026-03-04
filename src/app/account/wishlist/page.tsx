@@ -126,6 +126,7 @@ export default function WishlistPage() {
       }
 
       setToast({ title: "Ajouté au panier", message: product.name, variant: "success" });
+      window.dispatchEvent(new Event("effluve:counts"));
       router.refresh();
     } catch {
       setToast({ title: "Erreur", message: "Erreur réseau.", variant: "danger" });
@@ -136,11 +137,11 @@ export default function WishlistPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-angora-white px-4 py-12 sm:px-6 lg:px-12">
+      <main className="min-h-screen bg-effluve-white px-4 py-12 sm:px-6 lg:px-12">
         <div className="mx-auto max-w-7xl">
           <div className="mb-6">
-            <h1 className="font-title text-4xl text-angora-black">Mes Favoris</h1>
-            <p className="font-body text-angora-nero80 text-sm mt-2">
+            <h1 className="font-title text-4xl text-effluve-black">Mes Favoris</h1>
+            <p className="font-body text-effluve-nero/80 text-sm mt-2">
               Chargement de votre liste de souhaits…
             </p>
           </div>
@@ -151,25 +152,25 @@ export default function WishlistPage() {
 
   if (isGuest) {
     return (
-      <main className="min-h-screen bg-angora-white px-4 py-12 sm:px-6 lg:px-12">
+      <main className="min-h-screen bg-effluve-white px-4 py-12 sm:px-6 lg:px-12">
         <div className="mx-auto max-w-3xl text-center">
           <div className="mb-8">
-            <h1 className="font-title text-4xl md:text-5xl text-angora-black mb-3">
+            <h1 className="font-title text-4xl md:text-5xl text-effluve-black mb-3">
               Mes Favoris
             </h1>
-            <p className="font-body text-angora-nero">
+            <p className="font-body text-effluve-nero">
               Connecte-toi ou crée un compte pour sauvegarder tes articles préférés.
             </p>
           </div>
 
-          <div className="mx-auto mb-8 flex h-24 w-24 items-center justify-center rounded-full bg-angora-vanilla/20">
-            <Heart className="h-12 w-12 text-angora-vanilla" strokeWidth={1} />
+          <div className="mx-auto mb-8 flex h-24 w-24 items-center justify-center rounded-full bg-effluve-vanilla/20">
+            <Heart className="h-12 w-12 text-effluve-vanilla" strokeWidth={1} />
           </div>
 
           <div className="flex flex-wrap justify-center gap-3">
             <Link
               href="/login?next=/account/wishlist"
-              className="inline-flex items-center gap-2 px-8 py-3 bg-angora-black text-angora-white hover:bg-angora-vanilla hover:text-angora-nero transition-colors font-body text-xs uppercase tracking-[0.2em]"
+              className="inline-flex items-center gap-2 px-8 py-3 bg-effluve-black text-effluve-white hover:bg-effluve-vanilla hover:text-effluve-nero transition-colors font-body text-xs uppercase tracking-[0.2em]"
             >
               Se connecter
               <ArrowRight className="h-4 w-4" />
@@ -177,7 +178,7 @@ export default function WishlistPage() {
 
             <Link
               href="/register"
-              className="inline-flex items-center gap-2 px-8 py-3 border border-angora-black text-angora-black hover:bg-angora-black hover:text-angora-white transition-colors font-body text-xs uppercase tracking-[0.2em]"
+              className="inline-flex items-center gap-2 px-8 py-3 border border-effluve-black text-effluve-black hover:bg-effluve-black hover:text-effluve-white transition-colors font-body text-xs uppercase tracking-[0.2em]"
             >
               Créer un compte
             </Link>
@@ -188,21 +189,21 @@ export default function WishlistPage() {
   }
 
   return (
-    <main className="min-h-screen bg-angora-white px-4 py-12 sm:px-6 lg:px-12">
+    <main className="min-h-screen bg-effluve-white px-4 py-12 sm:px-6 lg:px-12">
       <div className="mx-auto max-w-7xl">
         <div className="mb-12 flex items-center justify-between gap-4">
           <div>
-            <h1 className="font-title text-4xl md:text-5xl text-angora-black mb-1">
+            <h1 className="font-title text-4xl md:text-5xl text-effluve-black mb-1">
               Mes Favoris
             </h1>
-            <p className="font-body text-angora-nero">
+            <p className="font-body text-effluve-nero">
               {favorites.length} {favorites.length > 1 ? "articles" : "article"}
             </p>
           </div>
 
           <Link
             href="/cart"
-            className="inline-flex items-center gap-2 rounded-full border border-angora-black px-4 py-2 text-xs font-body uppercase tracking-[0.18em] text-angora-black hover:bg-angora-black hover:text-angora-white transition-colors"
+            className="inline-flex items-center gap-2 rounded-full border border-effluve-black px-4 py-2 text-xs font-body uppercase tracking-[0.18em] text-effluve-black hover:bg-effluve-black hover:text-effluve-white transition-colors"
           >
             <ShoppingBag className="h-4 w-4" />
             Voir le panier
@@ -211,20 +212,20 @@ export default function WishlistPage() {
 
         {favorites.length === 0 ? (
           <div className="py-20 text-center">
-            <div className="mx-auto mb-8 flex h-24 w-24 items-center justify-center rounded-full bg-angora-vanilla/20">
-              <Heart className="h-12 w-12 text-angora-vanilla" strokeWidth={1} />
+            <div className="mx-auto mb-8 flex h-24 w-24 items-center justify-center rounded-full bg-effluve-vanilla/20">
+              <Heart className="h-12 w-12 text-effluve-vanilla" strokeWidth={1} />
             </div>
 
-            <h2 className="mb-4 font-title text-2xl text-angora-black">
+            <h2 className="mb-4 font-title text-2xl text-effluve-black">
               Votre liste de favoris est vide
             </h2>
-            <p className="mb-8 font-body text-lg text-angora-nero">
+            <p className="mb-8 font-body text-lg text-effluve-nero">
               Ajoutez des articles en cliquant sur le cœur ❤️
             </p>
 
             <Link
               href="/homme"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-angora-black text-angora-white hover:bg-angora-vanilla hover:text-angora-nero transition-colors font-body text-xs uppercase tracking-[0.2em]"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-effluve-black text-effluve-white hover:bg-effluve-vanilla hover:text-effluve-nero transition-colors font-body text-xs uppercase tracking-[0.2em]"
             >
               Découvrir la collection
               <ArrowRight className="h-4 w-4" />
@@ -236,7 +237,7 @@ export default function WishlistPage() {
               {favorites.map((item) => (
                 <div
                   key={item.id}
-                  className="group border border-gray-200 bg-white transition-colors hover:border-angora-vanilla"
+                  className="group border border-gray-200 bg-white transition-colors hover:border-effluve-vanilla"
                 >
                   <Link href={`/${String(item.category).toLowerCase()}/${item.productId}`}>
                     <div className="relative overflow-hidden bg-neutral-100 aspect-[3/4]">
@@ -262,23 +263,23 @@ export default function WishlistPage() {
                   </Link>
 
                   <div className="p-6">
-                    <p className="mb-2 font-body text-xs uppercase tracking-wider text-angora-nero/60">
+                    <p className="mb-2 font-body text-xs uppercase tracking-wider text-effluve-nero/60">
                       {item.category}
                     </p>
 
-                    <h3 className="mb-2 font-body text-base text-angora-black transition-colors group-hover:text-angora-vanilla">
+                    <h3 className="mb-2 font-body text-base text-effluve-black transition-colors group-hover:text-effluve-vanilla">
                       <Link href={`/${String(item.category).toLowerCase()}/${item.productId}`}>
                         {item.name}
                       </Link>
                     </h3>
 
                     {item.description ? (
-                      <p className="mb-3 line-clamp-2 font-body text-xs text-angora-nero/70">
+                      <p className="mb-3 line-clamp-2 font-body text-xs text-effluve-nero/70">
                         {item.description}
                       </p>
                     ) : null}
 
-                    <p className="mb-4 font-title text-xl text-angora-black">
+                    <p className="mb-4 font-title text-xl text-effluve-black">
                       {eurFromCents(item.priceCents)} €
                     </p>
 
@@ -286,7 +287,7 @@ export default function WishlistPage() {
                       <button
                         onClick={() => addToCart(item)}
                         disabled={!item.inStock || addingProductId === item.productId}
-                        className="flex-1 py-3 font-body text-xs uppercase tracking-wider transition-colors disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500 bg-angora-black text-angora-white hover:bg-angora-vanilla hover:text-angora-nero"
+                        className="flex-1 py-3 font-body text-xs uppercase tracking-wider transition-colors disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500 bg-effluve-black text-effluve-white hover:bg-effluve-vanilla hover:text-effluve-nero"
                       >
                         {addingProductId === item.productId
                           ? "Ajout…"
@@ -297,11 +298,11 @@ export default function WishlistPage() {
 
                       <button
                         onClick={() => removeFavorite(item.id)}
-                        className="groupdelete flex h-12 w-12 items-center justify-center border border-gray-300 transition-colors hover:border-red-600 hover:bg-red-50"
+                        className="group flex h-12 w-12 items-center justify-center border border-gray-300 transition-colors hover:border-red-600 hover:bg-red-50"
                         title="Retirer des favoris"
                       >
                         <Trash2
-                          className="h-5 w-5 text-angora-nero group-hoverdelete:text-red-600"
+                          className="h-5 w-5 text-effluve-nero group-hover:text-red-600"
                           strokeWidth={1.5}
                         />
                       </button>

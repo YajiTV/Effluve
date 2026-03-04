@@ -9,8 +9,8 @@ const nextConfig: NextConfig = {
 
   ...(isProd
     ? {
-        basePath: "/angora",
-        assetPrefix: "/angora",
+        basePath: "/effluve",
+        assetPrefix: "/effluve",
       }
     : {}),
 

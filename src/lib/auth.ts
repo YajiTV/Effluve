@@ -11,11 +11,11 @@ export type SessionUser = {
   role: "customer" | "admin";
 };
 
-const COOKIE_NAME = "angora_session";
+const COOKIE_NAME = "effluve_session";
 
 function secret() {
   const s = process.env.AUTH_SECRET;
-  if (!s) throw new Error("AUTH_SECRET manquant dans .env.local");
+  if (!s) throw new Error("AUTH_SECRET manquant dans .env");
   return new TextEncoder().encode(s);
 }
 

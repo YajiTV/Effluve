@@ -28,11 +28,11 @@
   --font-title: "Bodoni72", "Bodoni 72", "Bodoni MT", "Didot", serif;
   --font-body: "Helvetica", Arial, "Liberation Sans", sans-serif;
 
-  /* Couleurs Angora */
-  --angora-black: #000000;
-  --angora-white: #ffffff;
-  --angora-vanilla: #cfc1a7;
-  --angora-nero: #222222;
+  /* Couleurs Effluve */
+  --effluve-black: #000000;
+  --effluve-white: #ffffff;
+  --effluve-vanilla: #cfc1a7;
+  --effluve-nero: #222222;
 }
 
 /* ============================================ */
@@ -52,8 +52,8 @@
 /* ============================================ */
 
 body {
-  background: var(--angora-white);
-  color: var(--angora-nero);
+  background: var(--effluve-white);
+  color: var(--effluve-nero);
   font-family: var(--font-body);
 }
 
@@ -113,7 +113,7 @@ html {
 /* TAILWIND v4 — Toast Animations (CSS-first)  */
 /* ============================================ */
 /* Tailwind v4 génère animate-cart-toast-in / animate-cart-toast-out
-   via les variables --animate-* dans @theme. [web:229][web:253] */
+   via les variables --animate-* dans @theme. */
 
 @theme {
   --animate-cart-toast-in: cart-toast-in 520ms cubic-bezier(0.16, 1, 0.3, 1);

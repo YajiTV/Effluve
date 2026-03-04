@@ -14,7 +14,7 @@ export async function DELETE(_req: Request, { params }: Context) {
       return NextResponse.json({ error: "UNAUTHENTICATED" }, { status: 401 });
     }
 
-    const { id } = await params; // ✅ Next.js 16: params est une Promise [web:278]
+    const { id } = await params;
     const wishlistId = Number(id);
 
     if (!Number.isFinite(wishlistId) || wishlistId <= 0) {

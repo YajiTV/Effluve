@@ -9,11 +9,11 @@ export default {
     theme: {
         extend: {
             colors: {
-                // Palette Angora
-                'angora-black': '#000000',
-                'angora-white': '#FFFFFF',
-                'angora-vanilla': '#CFC1A7',
-                'angora-nero': '#222222',
+                // Palette Effluve
+                'effluve-black': '#000000',
+                'effluve-white': '#FFFFFF',
+                'effluve-vanilla': '#CFC1A7',
+                'effluve-nero': '#222222',
             },
             fontFamily: {
                 title: ['var(--font-title)'],

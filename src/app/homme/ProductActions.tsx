@@ -21,7 +21,7 @@ function errorMessage(err: unknown): string {
 }
 
 function bumpCounts() {
-  window.dispatchEvent(new Event("angora:counts"));
+  window.dispatchEvent(new Event("effluve:counts"));
 }
 
 export default function ProductActions({
@@ -106,7 +106,7 @@ export default function ProductActions({
 
       if (!res.ok) throw new Error(data?.message ?? data?.error ?? "Impossible de modifier les favoris.");
 
-      const isWished = Boolean(data?.wished); // true = ajouté, false = retiré [file:205]
+      const isWished = Boolean(data?.wished);
       setWished(isWished);
 
       setToastState(
@@ -130,8 +130,8 @@ export default function ProductActions({
         <button
           onClick={addToCart}
           disabled={!inStock || loadingCart}
-          className="h-10 rounded-xl bg-angora-black px-4 text-xs font-body uppercase tracking-[0.18em] text-angora-white
-                     hover:bg-angora-vanilla hover:text-angora-nero transition-colors
+          className="h-10 rounded-xl bg-effluve-black px-4 text-xs font-body uppercase tracking-[0.18em] text-effluve-white
+                     hover:bg-effluve-vanilla hover:text-effluve-nero transition-colors
                      disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loadingCart ? "Ajout…" : inStock ? "Ajouter" : "Indispo"}
@@ -140,8 +140,8 @@ export default function ProductActions({
         <button
           onClick={toggleWish}
           disabled={loadingWish}
-          className="h-10 w-12 rounded-xl border border-angora-black bg-angora-white text-angora-black
-                     hover:bg-angora-black hover:text-angora-white transition-colors
+          className="h-10 w-12 rounded-xl border border-effluve-black bg-effluve-white text-effluve-black
+                     hover:bg-effluve-black hover:text-effluve-white transition-colors
                      disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
           title="Favoris"
           aria-label="Favoris"

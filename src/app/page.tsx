@@ -1,7 +1,5 @@
 // app/page.tsx
 import Link from "next/link";
-import SearchBar from "@/components/HeaderSearch";
-
 
 export const dynamic = "force-dynamic";
 
@@ -40,7 +38,7 @@ export default function HomePage() {
 
         {/* Titre */}
         <h1 className="text-center font-serif text-5xl tracking-tight text-neutral-900 sm:text-6xl">
-          Angora
+          Effluve
         </h1>
 
         {/* Sous-titre */}
