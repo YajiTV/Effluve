@@ -4,6 +4,8 @@ export type Address = {
   id: number;
   firstName: string;
   lastName: string;
+  company: string | null;
+  vatNumber: string | null;
   line1: string;
   line2: string | null;
   postalCode: string;
@@ -35,6 +37,8 @@ export async function getUserAddresses(userId: number): Promise<Address[]> {
       id: row.id,
       firstName,
       lastName,
+      company: row.company ?? null,
+      vatNumber: row.vatNumber ?? null,
       line1: row.street,
       line2: null,
       postalCode: row.zipcode,
@@ -51,6 +55,8 @@ export async function createUserAddress(params: {
   userId: number;
   firstName: string;
   lastName: string;
+  company?: string | null;
+  vatNumber?: string | null;
   line1: string;
   line2: string | null;
   postalCode: string;
@@ -60,18 +66,7 @@ export async function createUserAddress(params: {
   isDefaultShipping: boolean;
   isDefaultBilling: boolean;
 }) {
-  const {
-    userId,
-    firstName,
-    lastName,
-    line1,
-    line2,
-    postalCode,
-    city,
-    country,
-    isDefaultShipping,
-    isDefaultBilling,
-  } = params;
+  const { userId, firstName, lastName, company, vatNumber, line1, line2, postalCode, city, country, isDefaultShipping, isDefaultBilling } = params;
 
   const isDefault = isDefaultShipping || isDefaultBilling;
   const fullName = [firstName, lastName].filter(Boolean).join(" ").trim();
@@ -93,6 +88,8 @@ export async function createUserAddress(params: {
         city,
         zipcode: postalCode,
         country,
+        company: company || null,
+        vatNumber: vatNumber || null,
         isDefault,
       },
       select: { id: true },

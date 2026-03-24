@@ -57,6 +57,7 @@ export default async function OrdersPage() {
                   <th className="px-4 py-3">Paiement</th>
                   <th className="px-4 py-3">Retour</th>
                   <th className="px-4 py-3">Détail</th>
+                  <th className="px-4 py-3">Facture</th>
                 </tr>
               </thead>
               <tbody>
@@ -74,6 +75,18 @@ export default async function OrdersPage() {
                       >
                         Voir
                       </Link>
+                    </td>
+                    <td className="px-4 py-3">
+                      {order.paymentStatus === "paid" ? (
+                        <Link
+                          href={`/account/orders/${order.id}/invoice`}
+                          className="font-semibold text-indigo-600 underline underline-offset-4 hover:text-indigo-800"
+                        >
+                          Facture
+                        </Link>
+                      ) : (
+                        <span className="text-neutral-400">—</span>
+                      )}
                     </td>
                   </tr>
                 ))}

@@ -2,11 +2,10 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 export default function RegisterPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [full_name, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -28,7 +27,8 @@ export default function RegisterPage() {
     setLoading(false);
 
     if (!res.ok) return setError(data?.error ?? 'Erreur');
-    const nextPath = searchParams.get("next") || "/account";
+
+    const nextPath = new URLSearchParams(window.location.search).get('next') || '/account';
     router.push(nextPath);
     router.refresh();
   }
@@ -48,6 +48,7 @@ export default function RegisterPage() {
               value={full_name}
               onChange={(e) => setFullName(e.target.value)}
               type="text"
+              autoComplete="name"
               required
             />
           </div>
@@ -59,6 +60,7 @@ export default function RegisterPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               type="email"
+              autoComplete="email"
               required
             />
           </div>
@@ -70,6 +72,7 @@ export default function RegisterPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               type="password"
+              autoComplete="new-password"
               required
             />
           </div>

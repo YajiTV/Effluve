@@ -68,14 +68,16 @@ export async function createReturnRequest(params: {
 }
 
 export async function getReturnsByUserId(userId: number): Promise<ReturnSummary[]> {
-  let rows: Awaited<ReturnType<typeof prisma.orderReturn.findMany>>;
+  const includeArgs = {
+    order: { select: { id: true, orderNumber: true } },
+    orderItem: { select: { id: true, productName: true } },
+  } as const;
+  type RowWithRelations = Prisma.OrderReturnGetPayload<{ include: typeof includeArgs }>;
+  let rows: RowWithRelations[];
   try {
     rows = await prisma.orderReturn.findMany({
       where: { userId },
-      include: {
-        order: { select: { id: true, orderNumber: true } },
-        orderItem: { select: { id: true, productName: true } },
-      },
+      include: includeArgs,
       orderBy: [{ requestedAt: "desc" }, { id: "desc" }],
     });
   } catch (error) {
@@ -100,7 +102,7 @@ export async function getReturnsByUserId(userId: number): Promise<ReturnSummary[
 export async function getLatestReturnStatusByOrderIds(userId: number, orderIds: number[]) {
   if (!orderIds.length) return new Map<number, ReturnStatus>();
 
-  let rows: Awaited<ReturnType<typeof prisma.orderReturn.findMany>>;
+  let rows: { orderId: number; status: ReturnStatus; createdAt: Date }[];
   try {
     rows = await prisma.orderReturn.findMany({
       where: { userId, orderId: { in: orderIds } },
@@ -121,14 +123,16 @@ export async function getLatestReturnStatusByOrderIds(userId: number, orderIds: 
 }
 
 export async function getAllReturnsForAdmin(): Promise<AdminReturnSummary[]> {
-  let rows: Awaited<ReturnType<typeof prisma.orderReturn.findMany>>;
+  const adminIncludeArgs = {
+    user: { select: { email: true, fullName: true } },
+    order: { select: { id: true, orderNumber: true } },
+    orderItem: { select: { id: true, productName: true } },
+  } as const;
+  type AdminRowWithRelations = Prisma.OrderReturnGetPayload<{ include: typeof adminIncludeArgs }>;
+  let rows: AdminRowWithRelations[];
   try {
     rows = await prisma.orderReturn.findMany({
-      include: {
-        user: { select: { email: true, fullName: true } },
-        order: { select: { id: true, orderNumber: true } },
-        orderItem: { select: { id: true, productName: true } },
-      },
+      include: adminIncludeArgs,
       orderBy: [{ requestedAt: "desc" }, { id: "desc" }],
     });
   } catch (error) {

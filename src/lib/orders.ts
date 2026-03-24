@@ -16,6 +16,7 @@ export type OrderDetail = {
   createdAt: string;
   totalCents: number;
   paymentStatus: OrderStatus;
+  stripeInvoiceUrl: string | null;
   shippingAddressId: number;
   billingAddressId: number;
   items: {
@@ -100,10 +101,18 @@ export async function createOrderFromCart(params: {
   });
 }
 
-export async function markOrderAsPaid(userId: number, orderId: number) {
+export async function markOrderAsPaid(
+  userId: number,
+  orderId: number,
+  invoice?: { stripeInvoiceId?: string; stripeInvoiceUrl?: string }
+) {
   const result = await prisma.order.updateMany({
     where: { id: orderId, userId, paymentStatus: "pending_payment" },
-    data: { paymentStatus: "paid" },
+    data: {
+      paymentStatus: "paid",
+      ...(invoice?.stripeInvoiceId ? { stripeInvoiceId: invoice.stripeInvoiceId } : {}),
+      ...(invoice?.stripeInvoiceUrl ? { stripeInvoiceUrl: invoice.stripeInvoiceUrl } : {}),
+    },
   });
   return result.count > 0;
 }
@@ -154,11 +163,71 @@ export async function getOrderDetailById(userId: number, orderId: number): Promi
     createdAt: row.createdAt.toISOString(),
     totalCents: row.totalCents,
     paymentStatus: row.paymentStatus,
+    stripeInvoiceUrl: row.stripeInvoiceUrl ?? null,
     shippingAddressId: row.shippingAddressId,
     billingAddressId: row.billingAddressId,
     items: row.items.map((item) => ({
       id: item.id,
       productId: item.productId,
+      productName: item.productName,
+      unitPriceCents: item.unitPriceCents,
+      quantity: item.quantity,
+      lineTotalCents: item.lineTotalCents,
+    })),
+  };
+}
+
+export type OrderInvoiceData = {
+  id: number;
+  orderNumber: string;
+  createdAt: string;
+  totalCents: number;
+  paymentStatus: OrderStatus;
+  customer: { fullName: string; email: string };
+  stripeInvoiceUrl: string | null;
+  shippingAddress: { name: string; street: string; city: string; zipcode: string; country: string; company: string | null };
+  billingAddress: { name: string; street: string; city: string; zipcode: string; country: string; company: string | null; vatNumber: string | null };
+  items: { productName: string; unitPriceCents: number; quantity: number; lineTotalCents: number }[];
+};
+
+export async function getOrderInvoiceData(userId: number, orderId: number): Promise<OrderInvoiceData | null> {
+  const row = await prisma.order.findFirst({
+    where: { id: orderId, userId, paymentStatus: "paid" },
+    include: {
+      items: { orderBy: { id: "asc" } },
+      user: { select: { fullName: true, email: true } },
+      shippingAddress: true,
+      billingAddress: true,
+    },
+  });
+  if (!row) return null;
+
+  return {
+    id: row.id,
+    orderNumber: row.orderNumber,
+    createdAt: row.createdAt.toISOString(),
+    totalCents: row.totalCents,
+    paymentStatus: row.paymentStatus,
+    stripeInvoiceUrl: row.stripeInvoiceUrl ?? null,
+    customer: { fullName: row.user.fullName, email: row.user.email },
+    shippingAddress: {
+      name: row.shippingAddress.name,
+      street: row.shippingAddress.street,
+      city: row.shippingAddress.city,
+      zipcode: row.shippingAddress.zipcode,
+      country: row.shippingAddress.country ?? "France",
+      company: row.shippingAddress.company ?? null,
+    },
+    billingAddress: {
+      name: row.billingAddress.name,
+      street: row.billingAddress.street,
+      city: row.billingAddress.city,
+      zipcode: row.billingAddress.zipcode,
+      country: row.billingAddress.country ?? "France",
+      company: row.billingAddress.company ?? null,
+      vatNumber: row.billingAddress.vatNumber ?? null,
+    },
+    items: row.items.map((item) => ({
       productName: item.productName,
       unitPriceCents: item.unitPriceCents,
       quantity: item.quantity,

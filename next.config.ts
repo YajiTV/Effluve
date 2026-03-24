@@ -7,6 +7,8 @@ const nextConfig: NextConfig = {
     root: __dirname,
   },
 
+  output: "standalone",
+
   ...(isProd
     ? {
         basePath: "/effluve",

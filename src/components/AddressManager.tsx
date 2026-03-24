@@ -19,6 +19,8 @@ type Address = {
 type FormState = {
   firstName: string;
   lastName: string;
+  company: string;
+  vatNumber: string;
   line1: string;
   line2: string;
   postalCode: string;
@@ -32,6 +34,8 @@ type FormState = {
 const initialForm: FormState = {
   firstName: "",
   lastName: "",
+  company: "",
+  vatNumber: "",
   line1: "",
   line2: "",
   postalCode: "",
@@ -132,6 +136,20 @@ export default function AddressManager({ initialAddresses }: { initialAddresses:
               required
             />
           </div>
+
+          <input
+            className="w-full rounded-xl border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-neutral-900"
+            placeholder="Entreprise (optionnel)"
+            value={form.company}
+            onChange={(e) => setForm((prev) => ({ ...prev, company: e.target.value }))}
+          />
+
+          <input
+            className="w-full rounded-xl border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-neutral-900"
+            placeholder="N° TVA intracommunautaire (optionnel)"
+            value={form.vatNumber}
+            onChange={(e) => setForm((prev) => ({ ...prev, vatNumber: e.target.value }))}
+          />
 
           <input
             className="w-full rounded-xl border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-neutral-900"

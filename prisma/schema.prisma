@@ -68,6 +68,8 @@ model Address {
   city       String   @db.VarChar(100)
   zipcode    String   @db.VarChar(10)
   country    String?  @default("France") @db.VarChar(100)
+  company    String?  @db.VarChar(255)
+  vatNumber  String?  @map("vat_number") @db.VarChar(50)
   isDefault  Boolean  @default(false) @map("is_default")
   createdAt  DateTime @default(now()) @map("created_at") @db.Timestamp(0)
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade, map: "fk_address_user")
@@ -114,8 +116,10 @@ model Order {
   userId            Int           @map("user_id") @db.Int
   orderNumber       String        @unique(map: "uq_orders_order_number") @map("order_number") @db.VarChar(64)
   totalCents        Int           @map("total_cents") @db.UnsignedInt
-  paymentStatus     PaymentStatus @default(pending_payment) @map("payment_status")
-  shippingAddressId Int           @map("shipping_address_id") @db.Int
+  paymentStatus       PaymentStatus @default(pending_payment) @map("payment_status")
+  stripeInvoiceId     String?      @map("stripe_invoice_id") @db.VarChar(255)
+  stripeInvoiceUrl    String?      @map("stripe_invoice_url") @db.VarChar(1024)
+  shippingAddressId   Int          @map("shipping_address_id") @db.Int
   billingAddressId  Int           @map("billing_address_id") @db.Int
   createdAt         DateTime      @default(now()) @map("created_at") @db.Timestamp(0)
   updatedAt         DateTime      @updatedAt @map("updated_at") @db.Timestamp(0)
@@ -160,6 +164,14 @@ model WishlistItem {
   @@unique([userId, productId], map: "uniq_wish_user_product")
   @@index([productId], map: "fk_wish_product")
   @@map("wishlist_items")
+}
+
+model NewsletterSubscriber {
+  id          Int      @id @default(autoincrement()) @db.Int
+  email       String   @unique @db.VarChar(255)
+  subscribedAt DateTime @default(now()) @map("subscribed_at") @db.Timestamp(0)
+
+  @@map("newsletter_subscribers")
 }
 
 model OrderReturn {

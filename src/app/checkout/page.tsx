@@ -24,7 +24,7 @@ export default async function CheckoutPage() {
             Validation et paiement
           </h1>
           <p className="mt-2 text-neutral-600">
-            Vérifie ton panier, choisis tes adresses et valide le paiement simulé.
+            Vérifie ton panier, choisis ton adresse et finalise ton paiement.
           </p>
         </div>
 

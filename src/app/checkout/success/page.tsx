@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function CheckoutSuccessPage() {
+function CheckoutSuccessContent() {
   const router = useRouter();
   const params = useSearchParams();
   const orderId = Number(params.get("orderId") ?? 0);
@@ -68,5 +68,19 @@ export default function CheckoutSuccessPage() {
         ) : null}
       </div>
     </main>
+  );
+}
+
+export default function CheckoutSuccessPage() {
+  return (
+    <Suspense fallback={
+      <main className="min-h-screen bg-neutral-50 px-4 py-12 sm:px-6 lg:px-12">
+        <div className="mx-auto max-w-xl rounded-2xl border border-neutral-200 bg-white p-8 shadow-sm">
+          <p className="text-neutral-700">Chargement...</p>
+        </div>
+      </main>
+    }>
+      <CheckoutSuccessContent />
+    </Suspense>
   );
 }
