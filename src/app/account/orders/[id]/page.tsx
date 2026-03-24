@@ -33,7 +33,7 @@ export default async function OrderDetailPage({ params }: Params) {
             <p className="text-xs font-semibold tracking-[0.2em] text-neutral-500 uppercase">Commande</p>
             <h1 className="mt-2 text-3xl font-semibold tracking-tight text-neutral-900">{order.orderNumber}</h1>
             <p className="mt-2 text-neutral-600">
-              Créée le {new Date(order.createdAt).toLocaleDateString("fr-FR")} - {labelForStatus(order.paymentStatus)}
+              Créée le {new Date(order.createdAt).toLocaleDateString("fr-FR")} — {labelForStatus(order.paymentStatus)}
             </p>
           </div>
           <Link href="/account/orders" className="text-sm font-semibold text-neutral-900 underline underline-offset-4">
@@ -51,7 +51,7 @@ export default async function OrderDetailPage({ params }: Params) {
                   <p className="text-sm text-neutral-700">{eurFromCents(item.lineTotalCents)} €</p>
                 </div>
                 <p className="mt-1 text-xs text-neutral-600">
-                  {item.quantity} x {eurFromCents(item.unitPriceCents)} €
+                  {item.quantity} × {eurFromCents(item.unitPriceCents)} €
                 </p>
               </article>
             ))}
@@ -64,16 +64,36 @@ export default async function OrderDetailPage({ params }: Params) {
             <p className="font-semibold text-neutral-900">{eurFromCents(order.totalCents)} €</p>
           </div>
 
-          {order.paymentStatus === "paid" ? (
-            <div className="mt-5">
+          {order.paymentStatus === "paid" && (
+            <div className="mt-6 flex flex-wrap gap-3">
+              {/* Facture Stripe (si disponible) */}
+              {order.stripeInvoiceUrl ? (
+                <a
+                  href={order.stripeInvoiceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex h-10 items-center gap-2 rounded-xl bg-indigo-600 px-5 text-sm font-semibold text-white hover:bg-indigo-700 transition-colors"
+                >
+                  Facture Stripe (PDF)
+                </a>
+              ) : null}
+
+              {/* Facture interne imprimable */}
+              <Link
+                href={`/account/orders/${order.id}/invoice`}
+                className="inline-flex h-10 items-center gap-2 rounded-xl border border-neutral-300 bg-white px-5 text-sm font-semibold text-neutral-900 hover:border-neutral-900 transition-colors"
+              >
+                Voir la facture
+              </Link>
+
               <Link
                 href="/account/returns"
-                className="text-sm font-semibold text-neutral-900 underline underline-offset-4"
+                className="inline-flex h-10 items-center rounded-xl border border-neutral-200 bg-white px-5 text-sm font-semibold text-neutral-700 hover:border-neutral-400 transition-colors"
               >
                 Demander un retour
               </Link>
             </div>
-          ) : null}
+          )}
         </section>
       </div>
     </main>

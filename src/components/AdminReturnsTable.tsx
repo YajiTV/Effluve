@@ -11,6 +11,7 @@ const STATUS_OPTIONS = [
   { value: "received", label: "Reçu" },
   { value: "refunded", label: "Remboursé" },
   { value: "cancelled", label: "Annulé" },
+  { value: "answer_waiting", label: "En attente de réponse" },
 ] as const;
 
 type StatusValue = (typeof STATUS_OPTIONS)[number]["value"];
