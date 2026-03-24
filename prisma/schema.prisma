@@ -1,0 +1,198 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  customer
+  admin
+}
+
+enum ProductCategory {
+  homme
+  femme
+  accessoires
+}
+
+enum PaymentStatus {
+  pending_payment
+  paid
+  cancelled
+}
+
+enum ReturnReason {
+  too_small
+  too_large
+  damaged
+  not_as_described
+  wrong_item
+  changed_mind
+  other
+}
+
+enum ReturnStatus {
+  requested
+  approved
+  rejected
+  received
+  refunded
+  cancelled
+  answer_waiting
+}
+
+model User {
+  id           Int            @id @default(autoincrement()) @db.Int
+  email        String         @unique(map: "email") @db.VarChar(255)
+  fullName     String         @map("full_name") @db.VarChar(255)
+  passwordHash String         @map("password_hash") @db.VarChar(255)
+  role         UserRole       @default(customer)
+  createdAt    DateTime       @default(now()) @map("created_at") @db.Timestamp(0)
+  addresses    Address[]
+  cartItems    CartItem[]
+  orders       Order[]
+  wishlist     WishlistItem[]
+  returns      OrderReturn[]
+
+  @@map("users")
+}
+
+model Address {
+  id         Int      @id @default(autoincrement()) @db.Int
+  userId     Int      @map("user_id") @db.Int
+  name       String   @db.VarChar(100)
+  street     String   @db.VarChar(255)
+  city       String   @db.VarChar(100)
+  zipcode    String   @db.VarChar(10)
+  country    String?  @default("France") @db.VarChar(100)
+  company    String?  @db.VarChar(255)
+  vatNumber  String?  @map("vat_number") @db.VarChar(50)
+  isDefault  Boolean  @default(false) @map("is_default")
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamp(0)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade, map: "fk_address_user")
+  shipOrders Order[]  @relation("OrdersShippingAddress")
+  billOrders Order[]  @relation("OrdersBillingAddress")
+
+  @@unique([userId, isDefault], map: "uniq_user_default")
+  @@index([userId], map: "fk_address_user")
+  @@map("addresses")
+}
+
+model Product {
+  id           Int            @id @default(autoincrement()) @db.Int
+  name         String         @db.VarChar(255)
+  description  String?        @db.Text
+  priceCents   Int            @map("pricecents") @db.Int
+  imageUrl     String?        @map("imageurl") @db.VarChar(1024)
+  category     ProductCategory
+  isActive     Boolean        @default(true) @map("isactive")
+  createdAt    DateTime       @default(now()) @map("created_at") @db.Timestamp(0)
+  cartItems    CartItem[]
+  orderItems   OrderItem[]
+  wishlistItem WishlistItem[]
+
+  @@map("products")
+}
+
+model CartItem {
+  id        Int      @id @default(autoincrement()) @db.Int
+  userId    Int      @map("user_id") @db.Int
+  productId Int      @map("product_id") @db.Int
+  quantity  Int      @default(1) @db.Int
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(0)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade, map: "fk_cart_user")
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade, map: "fk_cart_product")
+
+  @@unique([userId, productId], map: "uniq_cart_user_product")
+  @@index([productId], map: "fk_cart_product")
+  @@map("cart_items")
+}
+
+model Order {
+  id                Int           @id @default(autoincrement()) @db.Int
+  userId            Int           @map("user_id") @db.Int
+  orderNumber       String        @unique(map: "uq_orders_order_number") @map("order_number") @db.VarChar(64)
+  totalCents        Int           @map("total_cents") @db.UnsignedInt
+  paymentStatus       PaymentStatus @default(pending_payment) @map("payment_status")
+  stripeInvoiceId     String?      @map("stripe_invoice_id") @db.VarChar(255)
+  stripeInvoiceUrl    String?      @map("stripe_invoice_url") @db.VarChar(1024)
+  shippingAddressId   Int          @map("shipping_address_id") @db.Int
+  billingAddressId  Int           @map("billing_address_id") @db.Int
+  createdAt         DateTime      @default(now()) @map("created_at") @db.Timestamp(0)
+  updatedAt         DateTime      @updatedAt @map("updated_at") @db.Timestamp(0)
+  user              User          @relation(fields: [userId], references: [id], onDelete: Cascade, map: "fk_orders_user")
+  shippingAddress   Address       @relation("OrdersShippingAddress", fields: [shippingAddressId], references: [id], map: "fk_orders_shipping")
+  billingAddress    Address       @relation("OrdersBillingAddress", fields: [billingAddressId], references: [id], map: "fk_orders_billing")
+  items             OrderItem[]
+  returns           OrderReturn[]
+
+  @@index([userId], map: "idx_orders_user")
+  @@index([shippingAddressId], map: "idx_orders_shipping")
+  @@index([billingAddressId], map: "idx_orders_billing")
+  @@map("orders")
+}
+
+model OrderItem {
+  id            Int      @id @default(autoincrement()) @db.Int
+  orderId       Int      @map("order_id") @db.Int
+  productId     Int      @map("product_id") @db.Int
+  productName   String   @map("product_name") @db.VarChar(255)
+  unitPriceCents Int     @map("unit_price_cents") @db.UnsignedInt
+  quantity      Int      @db.UnsignedInt
+  lineTotalCents Int     @map("line_total_cents") @db.UnsignedInt
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamp(0)
+  order         Order    @relation(fields: [orderId], references: [id], onDelete: Cascade, map: "fk_order_items_order")
+  product       Product  @relation(fields: [productId], references: [id], map: "fk_order_items_product")
+  returns       OrderReturn[]
+
+  @@index([orderId], map: "idx_order_items_order")
+  @@index([productId], map: "fk_order_items_product")
+  @@map("order_items")
+}
+
+model WishlistItem {
+  id        Int      @id @default(autoincrement()) @db.Int
+  userId    Int      @map("user_id") @db.Int
+  productId Int      @map("product_id") @db.Int
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(0)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade, map: "fk_wish_user")
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade, map: "fk_wish_product")
+
+  @@unique([userId, productId], map: "uniq_wish_user_product")
+  @@index([productId], map: "fk_wish_product")
+  @@map("wishlist_items")
+}
+
+model NewsletterSubscriber {
+  id          Int      @id @default(autoincrement()) @db.Int
+  email       String   @unique @db.VarChar(255)
+  subscribedAt DateTime @default(now()) @map("subscribed_at") @db.Timestamp(0)
+
+  @@map("newsletter_subscribers")
+}
+
+model OrderReturn {
+  id          Int          @id @default(autoincrement()) @db.Int
+  userId      Int          @map("user_id") @db.Int
+  orderId     Int          @map("order_id") @db.Int
+  orderItemId Int?         @map("order_item_id") @db.Int
+  reason      ReturnReason
+  note        String?      @db.VarChar(500)
+  status      ReturnStatus @default(requested)
+  refundCents Int?         @map("refund_cents") @db.UnsignedInt
+  requestedAt DateTime     @default(now()) @map("requested_at") @db.Timestamp(0)
+  processedAt DateTime?    @map("processed_at") @db.Timestamp(0)
+  createdAt   DateTime     @default(now()) @map("created_at") @db.Timestamp(0)
+  updatedAt   DateTime     @updatedAt @map("updated_at") @db.Timestamp(0)
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade, map: "fk_order_returns_user")
+  order       Order        @relation(fields: [orderId], references: [id], onDelete: Cascade, map: "fk_order_returns_order")
+  orderItem   OrderItem?   @relation(fields: [orderItemId], references: [id], map: "fk_order_returns_item")
+
+  @@index([userId], map: "idx_order_returns_user")
+  @@index([orderId], map: "idx_order_returns_order")
+  @@index([status], map: "idx_order_returns_status")
+  @@map("order_returns")
+}
