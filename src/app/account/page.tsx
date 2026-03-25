@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { User, Package, MapPin, Heart, RotateCcw, Shield } from 'lucide-react';
 import { getSessionUser } from '@/lib/auth';
-import LogoutButton from '@/components/LogoutButton';
+import LogoutButton from '@/components/ui/LogoutButton';
 
 export default async function AccountPage() {
   const user = await getSessionUser();
@@ -56,7 +56,7 @@ export default async function AccountPage() {
               </Link>
 
               {user.role === 'admin' && (
-                <Link href="/admin/returns" className="flex items-center gap-3 px-4 py-3 font-body text-sm text-neutral-700 hover:bg-neutral-50 rounded transition-colors">
+                <Link href="/admin/" className="flex items-center gap-3 px-4 py-3 font-body text-sm text-neutral-700 hover:bg-neutral-50 rounded transition-colors">
                   <Shield className="w-5 h-5" strokeWidth={1.5} />
                   Dashboard admin
                 </Link>
