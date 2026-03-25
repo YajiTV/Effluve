@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Heart, Trash2, ShoppingBag, ArrowRight } from "lucide-react";
 
-import CartToast from "@/components/CartToast";
+import CartToast from "@/components/ui/CartToast";
 
 type WishlistItem = {
   id: number; // id de wishlist_items
@@ -26,6 +26,12 @@ type ToastState =
       message: string;
       variant?: "success" | "info" | "danger";
     };
+
+const CATEGORY_ROUTE: Record<string, string> = { homme: "men", femme: "women" };
+
+function categoryRoute(cat: string) {
+  return CATEGORY_ROUTE[cat.toLowerCase()] ?? cat.toLowerCase();
+}
 
 function eurFromCents(cents: number) {
   return (Number(cents) / 100).toFixed(2);
@@ -224,7 +230,7 @@ export default function WishlistPage() {
             </p>
 
             <Link
-              href="/homme"
+              href="/men"
               className="inline-flex items-center gap-2 px-8 py-4 bg-effluve-black text-effluve-white hover:bg-effluve-vanilla hover:text-effluve-nero transition-colors font-body text-xs uppercase tracking-[0.2em]"
             >
               Découvrir la collection
@@ -239,7 +245,7 @@ export default function WishlistPage() {
                   key={item.id}
                   className="group border border-gray-200 bg-white transition-colors hover:border-effluve-vanilla"
                 >
-                  <Link href={`/${String(item.category).toLowerCase()}/${item.productId}`}>
+                  <Link href={`/${categoryRoute(item.category)}/${item.productId}`}>
                     <div className="relative overflow-hidden bg-neutral-100 aspect-[3/4]">
                       {item.image ? (
                         <img
@@ -268,7 +274,7 @@ export default function WishlistPage() {
                     </p>
 
                     <h3 className="mb-2 font-body text-base text-effluve-black transition-colors group-hover:text-effluve-vanilla">
-                      <Link href={`/${String(item.category).toLowerCase()}/${item.productId}`}>
+                      <Link href={`/${categoryRoute(item.category)}/${item.productId}`}>
                         {item.name}
                       </Link>
                     </h3>

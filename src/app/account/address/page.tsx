@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import AddressManager from "@/components/AddressManager";
+import AddressManager from "@/components/account/AddressManager";
 import { getSessionUser } from "@/lib/auth";
 import { getUserAddresses } from "@/lib/addresses";
 

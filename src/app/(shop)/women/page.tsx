@@ -1,4 +1,4 @@
-import CategoryPage from "@/components/CategoryPage";
+import CategoryPage from "@/components/product/CategoryPage";
 
 export const dynamic = "force-dynamic";
 

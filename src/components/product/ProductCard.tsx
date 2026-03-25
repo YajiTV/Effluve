@@ -1,5 +1,5 @@
 import Link from "next/link";
-import ProductActions from "@/app/homme/ProductActions";
+import ProductActions from "@/components/product/ProductActions";
 import type { Product } from "@/lib/products";
 import { eurFromCents } from "@/lib/money";
 

@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import CheckoutClient from "@/components/CheckoutClient";
+import CheckoutClient from "@/components/checkout/CheckoutClient";
 import { getSessionUser } from "@/lib/auth";
 import { getUserAddresses } from "@/lib/addresses";
 import { getCartItemsByUserId } from "@/lib/cart";

@@ -6,7 +6,7 @@ const SECTIONS = [
   {
     titre: "Responsable du traitement",
     contenu: [
-      "EFFLUVE SAS, 12 rue de la Paix, 75002 Paris — contact@effluve.fr",
+      "EFFLUVE SAS, 12 rue pres dici, 31000 Toulouse — contact@effluve.fr",
     ],
   },
   {

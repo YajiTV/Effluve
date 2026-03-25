@@ -1,7 +1,7 @@
 import "./globals.css";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import ToastProvider from "@/components/ToastProvider";
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
+import ToastProvider from "@/components/ui/ToastProvider";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {

@@ -7,10 +7,9 @@ const SECTIONS = [
     titre: "Éditeur du site",
     contenu: [
       "Raison sociale : EFFLUVE SAS",
-      "Siège social : 12 rue de la Paix, 75002 Paris",
+      "Siège social : 12 rue pres dici, 31000 Toulouse",
       "Capital social : 10 000 €",
       "SIRET : 000 000 000 00000",
-      "RCS Paris : 000 000 000",
       "Directeur de la publication : Équipe EFFLUVE",
       "Contact : contact@effluve.fr",
     ],
@@ -18,9 +17,8 @@ const SECTIONS = [
   {
     titre: "Hébergement",
     contenu: [
-      "Hébergeur : Vercel Inc.",
-      "Adresse : 340 Pine Street, Suite 701, San Francisco, CA 94104, États-Unis",
-      "Site : vercel.com",
+      "Hébergeur : Mathys",
+      "Site : yaji.fr/projects/effluve",
     ],
   },
   {
@@ -46,7 +44,7 @@ const SECTIONS = [
   {
     titre: "Litiges",
     contenu: [
-      "Les présentes mentions légales sont soumises au droit français. En cas de litige, les tribunaux compétents seront ceux du ressort de Paris.",
+      "Les présentes mentions légales sont soumises au droit français. En cas de litige, les tribunaux compétents seront ceux du ressort de Toulouse.",
     ],
   },
 ];

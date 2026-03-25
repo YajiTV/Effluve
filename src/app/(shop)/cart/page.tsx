@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getSessionUser } from "@/lib/auth";
-import CartClient from "@/components/CartClient";
+import CartClient from "@/components/cart/CartClient";
 import { getCartItemsByUserId } from "@/lib/cart";
 
 export const dynamic = "force-dynamic";

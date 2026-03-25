@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ShoppingBag, Menu, X, Search, User } from "lucide-react";
 
-import HeaderSearch from "@/components/HeaderSearch";
+import HeaderSearch from "@/components/layout/HeaderSearch";
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -43,7 +43,7 @@ export default function Header() {
           {/* Gauche (desktop nav) */}
           <nav className="hidden lg:flex items-center gap-10 flex-1">
             <Link
-              href="/femme"
+              href="/women"
               className="group relative font-body text-xs uppercase tracking-[0.15em] text-effluve-black transition-all duration-300 hover:text-effluve-vanilla"
             >
               Femme
@@ -51,7 +51,7 @@ export default function Header() {
             </Link>
 
             <Link
-              href="/homme"
+              href="/men"
               className="group relative font-body text-xs uppercase tracking-[0.15em] text-effluve-black transition-all duration-300 hover:text-effluve-vanilla"
             >
               Homme
@@ -147,14 +147,14 @@ export default function Header() {
           <div className="lg:hidden py-8 border-t border-gray-200 animate-fadeIn">
             <nav className="flex flex-col gap-6">
               <Link
-                href="/femme"
+                href="/women"
                 className="font-body text-sm uppercase tracking-[0.15em] text-effluve-black hover:text-effluve-vanilla transition-colors py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Femme
               </Link>
               <Link
-                href="/homme"
+                href="/men"
                 className="font-body text-sm uppercase tracking-[0.15em] text-effluve-black hover:text-effluve-vanilla transition-colors py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >

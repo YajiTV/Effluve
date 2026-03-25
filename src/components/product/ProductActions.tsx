@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Heart } from "lucide-react";
 
-import CartToast from "@/components/CartToast";
+import CartToast from "@/components/ui/CartToast";
 
 type ToastState =
   | null
@@ -59,7 +59,7 @@ export default function ProductActions({
           message: "Connecte-toi pour ajouter au panier.",
           variant: "danger",
         });
-        router.push("/login?next=/homme");
+        router.push("/login?next=/men");
         return;
       }
 
@@ -96,7 +96,7 @@ export default function ProductActions({
           message: "Connecte-toi pour gérer tes favoris.",
           variant: "danger",
         });
-        router.push("/login?next=/homme");
+        router.push("/login?next=/men");
         return;
       }
 

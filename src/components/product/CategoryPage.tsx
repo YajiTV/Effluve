@@ -1,5 +1,5 @@
 import Link from "next/link";
-import ProductGrid from "@/components/ProductGrid";
+import ProductGrid from "@/components/product/ProductGrid";
 import { getProductsByCategory } from "@/lib/products";
 
 type CategoryPageProps = {

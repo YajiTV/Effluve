@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import ProductGrid from "@/components/ProductGrid";
+import ProductGrid from "@/components/product/ProductGrid";
 import { searchProducts } from "@/lib/products";
 
 export const dynamic = "force-dynamic";
