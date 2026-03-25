@@ -1,0 +1,17 @@
+{
+  "name": "effluve/php-prisma-integration",
+  "type": "project",
+  "require": {
+    "ext-curl": "*",
+    "ext-json": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "Effluve\\": "./"
+    }
+  },
+  "scripts": {
+    "serve": "php -S 127.0.0.1:8081 routes.php",
+    "test:health": "php -r \"echo file_get_contents(getenv('PRISMA_API_URL').'/health');\""
+  }
+}
