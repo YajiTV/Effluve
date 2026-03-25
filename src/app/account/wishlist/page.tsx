@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { Heart, Trash2, ShoppingBag, ArrowRight } from "lucide-react";
 
 import CartToast from "@/components/ui/CartToast";
+import { eurFromCents } from "@/lib/money";
 
 type WishlistItem = {
   id: number; // id de wishlist_items
@@ -27,15 +28,6 @@ type ToastState =
       variant?: "success" | "info" | "danger";
     };
 
-const CATEGORY_ROUTE: Record<string, string> = { homme: "men", femme: "women" };
-
-function categoryRoute(cat: string) {
-  return CATEGORY_ROUTE[cat.toLowerCase()] ?? cat.toLowerCase();
-}
-
-function eurFromCents(cents: number) {
-  return (Number(cents) / 100).toFixed(2);
-}
 
 export default function WishlistPage() {
   const router = useRouter();
@@ -226,7 +218,7 @@ export default function WishlistPage() {
               Votre liste de favoris est vide
             </h2>
             <p className="mb-8 font-body text-lg text-effluve-nero">
-              Ajoutez des articles en cliquant sur le cœur ❤️
+              Ajoutez des articles en cliquant sur le cœur
             </p>
 
             <Link
@@ -245,7 +237,7 @@ export default function WishlistPage() {
                   key={item.id}
                   className="group border border-gray-200 bg-white transition-colors hover:border-effluve-vanilla"
                 >
-                  <Link href={`/${categoryRoute(item.category)}/${item.productId}`}>
+                  <Link href={`/products/${item.productId}`}>
                     <div className="relative overflow-hidden bg-neutral-100 aspect-[3/4]">
                       {item.image ? (
                         <img
@@ -274,7 +266,7 @@ export default function WishlistPage() {
                     </p>
 
                     <h3 className="mb-2 font-body text-base text-effluve-black transition-colors group-hover:text-effluve-vanilla">
-                      <Link href={`/${categoryRoute(item.category)}/${item.productId}`}>
+                      <Link href={`/products/${item.productId}`}>
                         {item.name}
                       </Link>
                     </h3>

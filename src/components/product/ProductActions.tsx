@@ -27,9 +27,13 @@ function bumpCounts() {
 export default function ProductActions({
   productId,
   inStock,
+  sizes,
+  linkTo,
 }: {
   productId: number;
   inStock: boolean;
+  sizes?: string | null;
+  linkTo?: string;
 }) {
   const router = useRouter();
 
@@ -42,8 +46,16 @@ export default function ProductActions({
   // Toast unique (même style que Wishlist)
   const [toastState, setToastState] = useState<ToastState>(null);
 
+  const hasSizes = Boolean(sizes?.trim());
+
   const addToCart = async () => {
     if (!inStock || loadingCart) return;
+
+    // Si le produit a des tailles, on redirige vers la page produit pour choisir
+    if (hasSizes) {
+      router.push(linkTo ?? `/products/${productId}`);
+      return;
+    }
 
     setLoadingCart(true);
     try {
@@ -134,7 +146,7 @@ export default function ProductActions({
                      hover:bg-effluve-vanilla hover:text-effluve-nero transition-colors
                      disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {loadingCart ? "Ajout…" : inStock ? "Ajouter" : "Indispo"}
+          {loadingCart ? "Ajout…" : !inStock ? "Indispo" : hasSizes ? "Choisir" : "Ajouter"}
         </button>
 
         <button

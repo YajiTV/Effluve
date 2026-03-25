@@ -32,15 +32,7 @@ export default function Footer() {
         <section className="mx-auto flex w-full aspect-[16/9] min-h-[680px] flex-col rounded-2xl border border-[#1a1a1a] bg-[#090909] p-6 sm:p-8 lg:p-12">
 
           {/* Newsletter */}
-          <div className="mx-auto w-full max-w-5xl rounded-2xl border border-[#1f1f1f] bg-[#0d0d0d] p-6 sm:p-8">
-            <p className="text-center text-[clamp(1.2rem,2.2vw,2rem)] font-semibold tracking-tight text-[#f2f2f2] blur-[0.35px]">
-              Rejoins notre cercle privé
-            </p>
-            <p className="mx-auto mt-3 max-w-2xl text-center text-sm text-[#a8a8a8]">
-              Offres exclusives, nouveautés mode et sélections en avant-première.
-            </p>
-            <NewsletterForm />
-          </div>
+          <NewsletterForm />
 
           <div className="my-8 h-px w-full bg-[#262626]" />
 

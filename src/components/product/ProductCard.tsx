@@ -43,7 +43,13 @@ export default function ProductCard({
         ) : null}
 
         <h2 className="mt-2 text-base font-semibold text-neutral-900">
-          {product.name}
+          {linkTo ? (
+            <Link href={linkTo} className="hover:underline underline-offset-2">
+              {product.name}
+            </Link>
+          ) : (
+            product.name
+          )}
         </h2>
 
         <p className="mt-1 line-clamp-2 text-sm text-neutral-600">
@@ -56,7 +62,12 @@ export default function ProductCard({
           </p>
 
           {showActions ? (
-            <ProductActions productId={product.id} inStock={Boolean(product.isActive)} />
+            <ProductActions
+              productId={product.id}
+              inStock={Boolean(product.isActive)}
+              sizes={product.sizes}
+              linkTo={linkTo}
+            />
           ) : linkTo ? (
             <Link
               href={linkTo}

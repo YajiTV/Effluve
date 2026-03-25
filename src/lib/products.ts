@@ -9,6 +9,8 @@ export type Product = {
   imageUrl: string | null;
   category: "homme" | "femme" | "accessoires";
   isActive: 0 | 1;
+  stock: number;
+  sizes: string | null;
 };
 
 function toProduct(row: {
@@ -19,6 +21,8 @@ function toProduct(row: {
   imageUrl: string | null;
   category: ProductCategory;
   isActive: boolean;
+  stock: number;
+  sizes?: string | null;
 }): Product {
   return {
     id: row.id,
@@ -28,6 +32,8 @@ function toProduct(row: {
     imageUrl: row.imageUrl ?? null,
     category: row.category as Product["category"],
     isActive: row.isActive ? 1 : 0,
+    stock: row.stock,
+    sizes: row.sizes ?? null,
   };
 }
 
@@ -47,6 +53,12 @@ export async function getProductsByCategories(categories: ("homme" | "femme")[])
   });
 
   return rows.map(toProduct);
+}
+
+export async function getProductById(id: number): Promise<Product | null> {
+  const row = await prisma.product.findFirst({ where: { id, isActive: true } });
+  if (!row) return null;
+  return toProduct(row);
 }
 
 export async function searchProducts(query: string, limit = 48) {

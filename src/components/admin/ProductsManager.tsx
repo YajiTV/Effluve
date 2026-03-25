@@ -19,6 +19,7 @@ const EMPTY_FORM = {
   imageUrl: "",
   category: "femme" as ProductCategory,
   stock: "0",
+  sizes: "",
   isActive: true,
 };
 
@@ -48,6 +49,7 @@ export default function ProductsManager({ initialProducts }: { initialProducts: 
       imageUrl: product.imageUrl ?? "",
       category: product.category,
       stock: String(product.stock),
+      sizes: product.sizes ?? "",
       isActive: product.isActive,
     });
     setShowForm(true);
@@ -64,6 +66,7 @@ export default function ProductsManager({ initialProducts }: { initialProducts: 
       imageUrl: form.imageUrl || null,
       category: form.category,
       stock: parseInt(form.stock, 10),
+      sizes: form.sizes || null,
       isActive: form.isActive,
     };
 
@@ -186,6 +189,16 @@ export default function ProductsManager({ initialProducts }: { initialProducts: 
                 value={form.stock}
                 onChange={(e) => setForm({ ...form, stock: e.target.value })}
                 className="input"
+              />
+            </Field>
+
+            <Field label="Tailles disponibles (ex: XS,S,M,L,XL)" className="sm:col-span-2">
+              <input
+                type="text"
+                value={form.sizes}
+                onChange={(e) => setForm({ ...form, sizes: e.target.value })}
+                className="input"
+                placeholder="XS,S,M,L,XL — laisser vide si sans taille"
               />
             </Field>
 

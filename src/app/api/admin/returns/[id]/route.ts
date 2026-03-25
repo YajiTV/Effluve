@@ -12,6 +12,7 @@ const ALLOWED_STATUS: ReturnStatus[] = [
   "received",
   "refunded",
   "cancelled",
+  "answer_waiting",
 ];
 
 export async function PATCH(req: Request, { params }: Context) {

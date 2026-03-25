@@ -10,6 +10,7 @@ export type AdminProduct = {
   category: ProductCategory;
   stock: number;
   isActive: boolean;
+  sizes: string | null;
 };
 
 export type ProductPayload = {
@@ -20,6 +21,7 @@ export type ProductPayload = {
   category: ProductCategory;
   stock: number;
   isActive: boolean;
+  sizes?: string | null;
 };
 
 export async function getAllProductsForAdmin(): Promise<AdminProduct[]> {
@@ -34,9 +36,10 @@ export async function getAllProductsForAdmin(): Promise<AdminProduct[]> {
       category: true,
       stock: true,
       isActive: true,
+      sizes: true,
     },
   });
-  return rows;
+  return rows.map((r) => ({ ...r, sizes: r.sizes ?? null }));
 }
 
 export async function createProduct(data: ProductPayload) {

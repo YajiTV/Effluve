@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 
-export type OrderStatus = "pending_payment" | "paid" | "cancelled";
+export type OrderStatus = "pending_payment" | "paid" | "preparing" | "shipped" | "delivered" | "cancelled";
 
 export type OrderSummary = {
   id: number;

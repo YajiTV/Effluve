@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { eurFromCents } from "@/lib/money";
 
 type Address = {
   id: number;
@@ -54,10 +55,6 @@ const emptyForm: AddressFormState = {
   country: "France",
   phone: "",
 };
-
-function eurFromCents(cents: number) {
-  return (Number(cents) / 100).toFixed(2);
-}
 
 function defaultAddressId(addresses: Address[], key: "shipping" | "billing") {
   const found = addresses.find((a) =>
@@ -241,7 +238,7 @@ export default function CheckoutClient({
     setCreating(false);
 
     if (!res?.ok) {
-      const data = await res.json().catch(() => ({}));
+      const data = res ? await res.json().catch(() => ({})) : {};
       if (data.error === "STOCK_INSUFFISANT") {
         setError(`Article(s) en rupture de stock : ${data.products}. Veuillez retirer ces articles de votre panier.`);
       } else {

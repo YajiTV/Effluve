@@ -8,6 +8,7 @@ export type CartItem = {
   pricecents: number;
   imageurl: string | null;
   stock: number;
+  size: string;
 };
 
 export async function getCartItemsByUserId(userId: number): Promise<CartItem[]> {
@@ -25,6 +26,7 @@ export async function getCartItemsByUserId(userId: number): Promise<CartItem[]> 
     pricecents: row.product.priceCents,
     imageurl: row.product.imageUrl ?? null,
     stock: row.product.stock,
+    size: row.size ?? "",
   }));
 }
 

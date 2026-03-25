@@ -2,20 +2,8 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-
-type CartItem = {
-  cartitemid: number;
-  quantity: number;
-  productid: number;
-  name: string;
-  pricecents: number;
-  imageurl: string | null;
-  stock: number;
-};
-
-function eurFromCents(cents: number) {
-  return (Number(cents) / 100).toFixed(2);
-}
+import { eurFromCents } from "@/lib/money";
+import type { CartItem } from "@/lib/cart";
 
 function bumpCounts() {
   window.dispatchEvent(new Event("effluve:counts"));
@@ -45,11 +33,11 @@ export default function CartClient({
   // True si au moins un article est en rupture de stock
   const hasOutOfStock = items.some((item) => item.stock === 0);
 
-  const addOne = async (productId: number) => {
+  const addOne = async (productId: number, size: string) => {
     await fetch("/api/cart/add", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ productId }),
+      body: JSON.stringify({ productId, size: size || undefined }),
     });
     setItems(await reloadCart());
     bumpCounts();
@@ -155,6 +143,9 @@ export default function CartClient({
                             <h3 className="text-base font-semibold text-neutral-900">{item.name}</h3>
                             <p className="mt-1 text-sm text-neutral-600">
                               Prix: <span className="font-semibold text-neutral-900">{unit} €</span>{" "}
+                              {item.size ? (
+                                <>• Taille: <span className="font-semibold text-neutral-900">{item.size}</span>{" "}</>
+                              ) : null}
                               • Quantité:{" "}
                               <span className="font-semibold text-neutral-900">{item.quantity}</span>
                             </p>
@@ -187,7 +178,7 @@ export default function CartClient({
                             onClick={async () => {
                               setBusyCartItemId(item.cartitemid);
                               try {
-                                await addOne(item.productid);
+                                await addOne(item.productid, item.size);
                               } finally {
                                 setBusyCartItemId(null);
                               }

@@ -21,7 +21,7 @@ export default function ProductGrid({
   return (
     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {products.map((product) => {
-        const linkTo = showLink ? `/${product.category}/${product.id}` : undefined;
+        const linkTo = showLink || showActions ? `/products/${product.id}` : undefined;
         return (
           <ProductCard
             key={product.id}
