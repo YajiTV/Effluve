@@ -91,6 +91,7 @@ model Product {
   priceCents   Int            @map("pricecents") @db.Int
   imageUrl     String?        @map("imageurl") @db.VarChar(1024)
   category     ProductCategory
+  stock        Int            @default(0) @db.Int
   isActive     Boolean        @default(true) @map("isactive")
   createdAt    DateTime       @default(now()) @map("created_at") @db.Timestamp(0)
   cartItems    CartItem[]
