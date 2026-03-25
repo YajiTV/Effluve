@@ -56,8 +56,8 @@ export default async function InvoicePage({ params }: Params) {
           <div className="flex items-start justify-between mb-10">
             <div>
               <p className="text-2xl font-bold tracking-tight text-neutral-900">EFFLUVE</p>
-              <p className="mt-1 text-xs text-neutral-500">12 rue du Faubourg Saint-Honoré</p>
-              <p className="text-xs text-neutral-500">75008 Paris — France</p>
+              <p className="mt-1 text-xs text-neutral-500">12 rue pres dici</p>
+              <p className="text-xs text-neutral-500">31000 Toulouse — France</p>
               <p className="text-xs text-neutral-500">contact@effluve.fr</p>
             </div>
             <div className="text-right">

@@ -30,8 +30,8 @@ export default function ContactPage() {
             <h2 className="text-xl font-semibold text-effluve-black">Adresse</h2>
             <p className="text-sm leading-relaxed">
               EFFLUVE SAS<br />
-              12 rue du Faubourg Saint-Honoré<br />
-              75008 Paris — France
+              12 rue pres dici<br />
+              31000 Toulouse — France
             </p>
           </section>
         </div>

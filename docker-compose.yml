@@ -1,0 +1,43 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: effluve_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: effluve
+      MYSQL_USER: effluve
+      MYSQL_PASSWORD: effluve
+    ports:
+      - "3306:3306"
+    volumes:
+      - effluve_db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "effluve", "-peffluve"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: effluve_app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: mysql://effluve:effluve@db:3306/effluve
+      AUTH_SECRET: effluve
+      PRISMA_API_URL: http://localhost:4010
+      PRISMA_API_TOKEN: change-me-in-production
+      NEXT_PUBLIC_API_URL: http://localhost:3000/api
+      # Renseigner vos clés Stripe ici ou via un fichier .env
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
+      NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}
+    ports:
+      - "3000:3000"
+
+volumes:
+  effluve_db_data:
