@@ -241,7 +241,12 @@ export default function CheckoutClient({
     setCreating(false);
 
     if (!res?.ok) {
-      setError("Impossible de valider la commande.");
+      const data = await res.json().catch(() => ({}));
+      if (data.error === "STOCK_INSUFFISANT") {
+        setError(`Article(s) en rupture de stock : ${data.products}. Veuillez retirer ces articles de votre panier.`);
+      } else {
+        setError("Impossible de valider la commande.");
+      }
       return;
     }
 

@@ -40,6 +40,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "ADRESSE_INVALIDE" }, { status: 400 });
     }
 
+    if (message.startsWith("STOCK_INSUFFISANT:")) {
+      const products = message.replace("STOCK_INSUFFISANT:", "");
+      return NextResponse.json({ error: "STOCK_INSUFFISANT", products }, { status: 400 });
+    }
+
     return NextResponse.json({ error: "ORDER_CREATE_FAILED" }, { status: 500 });
   }
 }

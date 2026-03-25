@@ -10,6 +10,7 @@ type CartItem = {
   name: string;
   pricecents: number;
   imageurl: string | null;
+  stock: number;
 };
 
 function eurFromCents(cents: number) {
@@ -40,6 +41,9 @@ export default function CartClient({
     () => items.reduce((sum, r) => sum + Number(r.pricecents) * Number(r.quantity), 0),
     [items]
   );
+
+  // True si au moins un article est en rupture de stock
+  const hasOutOfStock = items.some((item) => item.stock === 0);
 
   const addOne = async (productId: number) => {
     await fetch("/api/cart/add", {
@@ -141,6 +145,11 @@ export default function CartClient({
                       </div>
 
                       <div className="p-4">
+                        {item.stock === 0 && (
+                          <div className="mb-3 flex items-center gap-2 rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-700">
+                            <span>Cet article est en rupture de stock et ne pourra pas être commandé.</span>
+                          </div>
+                        )}
                         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                           <div>
                             <h3 className="text-base font-semibold text-neutral-900">{item.name}</h3>
@@ -234,11 +243,17 @@ export default function CartClient({
                 <span className="text-lg font-semibold text-neutral-900">{eurFromCents(totalCents)} €</span>
               </div>
 
+              {hasOutOfStock && (
+                <p className="mt-4 rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-xs text-red-700">
+                  Retirez les articles en rupture de stock pour continuer.
+                </p>
+              )}
+
               <Link
                 href="/checkout"
                 className={[
                   "mt-4 inline-flex h-11 w-full items-center justify-center rounded-xl text-sm font-semibold",
-                  items.length
+                  items.length && !hasOutOfStock
                     ? "bg-neutral-900 text-white hover:bg-black transition"
                     : "pointer-events-none bg-neutral-300 text-neutral-500",
                 ].join(" ")}

@@ -54,12 +54,23 @@ export async function createOrderFromCart(params: {
   return prisma.$transaction(async (tx) => {
     const cartItems = await tx.cartItem.findMany({
       where: { userId },
-      include: { product: true },
+      include: {
+        product: {
+          select: { id: true, name: true, priceCents: true, stock: true },
+        },
+      },
       orderBy: { id: "desc" },
     });
 
     if (!cartItems.length) {
       throw new Error("PANIER_VIDE");
+    }
+
+    // Vérifie que tous les articles ont du stock suffisant
+    const outOfStock = cartItems.filter((item) => item.product.stock < item.quantity);
+    if (outOfStock.length > 0) {
+      const names = outOfStock.map((item) => item.product.name).join(", ");
+      throw new Error(`STOCK_INSUFFISANT:${names}`);
     }
 
     const [shippingAddress, billingAddress] = await Promise.all([
@@ -94,6 +105,14 @@ export async function createOrderFromCart(params: {
         lineTotalCents: item.product.priceCents * item.quantity,
       })),
     });
+
+    // Décrémente le stock de chaque produit commandé
+    for (const item of cartItems) {
+      await tx.product.update({
+        where: { id: item.productId },
+        data: { stock: { decrement: item.quantity } },
+      });
+    }
 
     await tx.cartItem.deleteMany({ where: { userId } });
 
