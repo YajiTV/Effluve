@@ -21,6 +21,9 @@ enum ProductCategory {
 enum PaymentStatus {
   pending_payment
   paid
+  preparing
+  shipped
+  delivered
   cancelled
 }
 

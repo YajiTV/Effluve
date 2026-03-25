@@ -58,6 +58,7 @@ export default async function AdminPage() {
         <div className="pt-4 border-t border-neutral-200">
           <p className="text-xs uppercase tracking-widest text-neutral-400 mb-4">Accès rapide</p>
           <div className="flex flex-wrap gap-3">
+            <AdminLink href="/admin/orders" label="Commandes" />
             <AdminLink href="/admin/returns" label="Retours" />
           </div>
         </div>
