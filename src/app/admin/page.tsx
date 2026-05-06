@@ -61,6 +61,7 @@ export default async function AdminPage() {
             <AdminLink href="/admin/products" label="Produits" />
             <AdminLink href="/admin/orders" label="Commandes" />
             <AdminLink href="/admin/returns" label="Retours" />
+            <AdminLink href="/admin/newsletter" label="Newsletter" />
           </div>
         </div>
 

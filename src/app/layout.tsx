@@ -20,9 +20,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="fr">
       <body className="min-h-dvh bg-effluve-white text-effluve-black">
         <ToastProvider />
-        <Header />
+        <div className="print:hidden"><Header /></div>
         {children}
-        <Footer />
+        <div className="print:hidden"><Footer /></div>
       </body>
     </html>
   );
