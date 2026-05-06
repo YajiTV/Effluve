@@ -1,7 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { PaymentStatus } from "@prisma/client";
 
-// Statuts accessibles à l'admin (hors pending_payment qui est géré automatiquement)
 export const ORDER_STATUSES: PaymentStatus[] = [
   "paid",
   "preparing",
@@ -19,6 +18,9 @@ export type AdminOrder = {
   customerName: string;
   customerEmail: string;
   itemCount: number;
+  trackingNumber: string | null;
+  labelUrl: string | null;
+  carrierName: string | null;
 };
 
 export async function getAllOrdersForAdmin(): Promise<AdminOrder[]> {
@@ -30,6 +32,9 @@ export async function getAllOrdersForAdmin(): Promise<AdminOrder[]> {
       createdAt: true,
       totalCents: true,
       paymentStatus: true,
+      trackingNumber: true,
+      labelUrl: true,
+      carrierName: true,
       user: { select: { fullName: true, email: true } },
       items: { select: { quantity: true } },
     },
@@ -44,6 +49,9 @@ export async function getAllOrdersForAdmin(): Promise<AdminOrder[]> {
     customerName: row.user.fullName,
     customerEmail: row.user.email,
     itemCount: row.items.reduce((sum, item) => sum + item.quantity, 0),
+    trackingNumber: row.trackingNumber ?? null,
+    labelUrl: row.labelUrl ?? null,
+    carrierName: row.carrierName ?? null,
   }));
 }
 

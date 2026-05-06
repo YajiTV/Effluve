@@ -34,6 +34,14 @@ type CreatedOrder = {
   paymentStatus: "pending_payment";
 };
 
+type PendingOrder = {
+  id: number;
+  orderNumber: string;
+  totalCents: number;
+  createdAt: string;
+  items: { productName: string; quantity: number; unitPriceCents: number }[];
+};
+
 type AddressFormState = {
   firstName: string;
   lastName: string;
@@ -184,9 +192,11 @@ function InlineAddressForm({
 export default function CheckoutClient({
   addresses: initialAddresses,
   cartItems,
+  pendingOrders = [],
 }: {
   addresses: Address[];
   cartItems: CartItem[];
+  pendingOrders?: PendingOrder[];
 }) {
   const router = useRouter();
   const [addresses, setAddresses] = useState<Address[]>(initialAddresses);
@@ -208,6 +218,9 @@ export default function CheckoutClient({
   const [paymentStatus, setPaymentStatus] = useState<
     "pending_payment" | "paid" | "cancelled" | null
   >(null);
+  const [resumingId, setResumingId] = useState<number | null>(null);
+  const [cancellingId, setCancellingId] = useState<number | null>(null);
+  const [localPendingOrders, setLocalPendingOrders] = useState<PendingOrder[]>(pendingOrders);
 
   const totalCents = useMemo(
     () => cartItems.reduce((sum, item) => sum + item.pricecents * item.quantity, 0),
@@ -318,7 +331,47 @@ export default function CheckoutClient({
     setPaymentStatus("cancelled");
   };
 
-  if (!cartItems.length) {
+  const resumePayment = async (orderId: number) => {
+    setError(null);
+    setResumingId(orderId);
+
+    const res = await fetch("/api/payment/stripe/session", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ orderId }),
+    }).catch(() => null);
+
+    setResumingId(null);
+
+    if (!res?.ok) {
+      const data = await res?.json().catch(() => null);
+      setError(data?.error === "STRIPE_NOT_CONFIGURED"
+        ? "Stripe n'est pas configuré. Vérifie ta clé API dans .env."
+        : "Impossible d'initier le paiement.");
+      return;
+    }
+
+    const data = (await res.json()) as { url?: string };
+    if (!data.url) { setError("URL de paiement invalide."); return; }
+    window.location.href = data.url;
+  };
+
+  const cancelPendingOrder = async (orderId: number) => {
+    setError(null);
+    setCancellingId(orderId);
+
+    const res = await fetch("/api/payment/cancel", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ orderId }),
+    }).catch(() => null);
+
+    setCancellingId(null);
+    if (!res?.ok) { setError("Annulation impossible."); return; }
+    setLocalPendingOrders((prev) => prev.filter((o) => o.id !== orderId));
+  };
+
+  if (!cartItems.length && localPendingOrders.length === 0) {
     return (
       <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
         <p className="font-semibold text-neutral-900">Ton panier est vide.</p>
@@ -327,7 +380,107 @@ export default function CheckoutClient({
     );
   }
 
+  if (!cartItems.length && localPendingOrders.length > 0) {
+    return (
+      <div className="space-y-4">
+        {error && <p className="text-sm text-red-600">{error}</p>}
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5">
+          <p className="text-sm font-semibold text-amber-900">
+            Tu as {localPendingOrders.length === 1 ? "une commande en attente de paiement" : `${localPendingOrders.length} commandes en attente de paiement`}.
+          </p>
+          <p className="mt-1 text-sm text-amber-700">
+            Reprends le paiement ou annule pour remettre les articles en stock.
+          </p>
+        </div>
+        {localPendingOrders.map((order) => (
+          <div key={order.id} className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-semibold text-neutral-900">{order.orderNumber}</p>
+                <p className="text-xs text-neutral-500 mt-0.5">
+                  {new Date(order.createdAt).toLocaleDateString("fr-FR")} — {eurFromCents(order.totalCents)} €
+                </p>
+              </div>
+              <span className="inline-block rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800">
+                En attente de paiement
+              </span>
+            </div>
+            <div className="space-y-1">
+              {order.items.map((item, i) => (
+                <div key={i} className="flex justify-between text-sm text-neutral-700">
+                  <span>{item.productName} × {item.quantity}</span>
+                  <span>{eurFromCents(item.unitPriceCents * item.quantity)} €</span>
+                </div>
+              ))}
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <button
+                onClick={() => resumePayment(order.id)}
+                disabled={resumingId === order.id}
+                className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-indigo-600 px-6 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-60"
+              >
+                {resumingId === order.id ? "Redirection..." : "Reprendre le paiement"}
+              </button>
+              <button
+                onClick={() => cancelPendingOrder(order.id)}
+                disabled={cancellingId === order.id}
+                className="inline-flex h-10 items-center justify-center rounded-xl border border-neutral-300 bg-white px-4 text-sm font-semibold text-neutral-900 hover:border-neutral-400 disabled:opacity-60"
+              >
+                {cancellingId === order.id ? "Annulation..." : "Annuler la commande"}
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
   return (
+    <div className="space-y-6">
+      {localPendingOrders.length > 0 && !createdOrder && (
+        <div className="space-y-4">
+          <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4">
+            <p className="text-sm font-semibold text-amber-900">
+              {localPendingOrders.length === 1
+                ? "Tu as une commande en attente de paiement."
+                : `Tu as ${localPendingOrders.length} commandes en attente de paiement.`}
+            </p>
+          </div>
+          {localPendingOrders.map((order) => (
+            <div key={order.id} className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm space-y-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-semibold text-neutral-900">{order.orderNumber}</p>
+                  <p className="text-xs text-neutral-500 mt-0.5">
+                    {new Date(order.createdAt).toLocaleDateString("fr-FR")} — {eurFromCents(order.totalCents)} €
+                  </p>
+                </div>
+                <span className="inline-block rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800">
+                  En attente de paiement
+                </span>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                <button
+                  onClick={() => resumePayment(order.id)}
+                  disabled={resumingId === order.id}
+                  className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-indigo-600 px-6 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-60"
+                >
+                  {resumingId === order.id ? "Redirection..." : "Reprendre le paiement"}
+                </button>
+                <button
+                  onClick={() => cancelPendingOrder(order.id)}
+                  disabled={cancellingId === order.id}
+                  className="inline-flex h-10 items-center justify-center rounded-xl border border-neutral-300 bg-white px-4 text-sm font-semibold text-neutral-900 hover:border-neutral-400 disabled:opacity-60"
+                >
+                  {cancellingId === order.id ? "Annulation..." : "Annuler"}
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+    {/* On masque les pending orders dès qu'un nouvel ordre est en cours de paiement */}
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_360px]">
       <section className="space-y-6 rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
 
@@ -482,6 +635,7 @@ export default function CheckoutClient({
           <span>{eurFromCents(totalCents)} €</span>
         </div>
       </aside>
+    </div>
     </div>
   );
 }

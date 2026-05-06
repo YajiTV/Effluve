@@ -33,6 +33,8 @@ export default async function OrdersPage() {
     orders.map((order) => order.id)
   );
 
+  const hasAnyReturn = orders.some((o) => returnStatusByOrder.get(o.id) !== undefined);
+
   return (
     <main className="min-h-screen bg-neutral-50 px-4 py-12 sm:px-6 lg:px-12">
       <div className="mx-auto max-w-6xl space-y-6">
@@ -55,7 +57,7 @@ export default async function OrdersPage() {
                   <th className="px-4 py-3">Date</th>
                   <th className="px-4 py-3">Montant</th>
                   <th className="px-4 py-3">Paiement</th>
-                  <th className="px-4 py-3">Retour</th>
+                  {hasAnyReturn && <th className="px-4 py-3">Retour</th>}
                   <th className="px-4 py-3">Détail</th>
                   <th className="px-4 py-3">Facture</th>
                 </tr>
@@ -67,7 +69,13 @@ export default async function OrdersPage() {
                     <td className="px-4 py-3">{new Date(order.createdAt).toLocaleDateString("fr-FR")}</td>
                     <td className="px-4 py-3">{eurFromCents(order.totalCents)} €</td>
                     <td className="px-4 py-3">{labelForStatus(order.paymentStatus)}</td>
-                    <td className="px-4 py-3">{labelForReturnStatus(returnStatusByOrder.get(order.id))}</td>
+                    {hasAnyReturn && (
+                      <td className="px-4 py-3">
+                        {returnStatusByOrder.get(order.id) !== undefined
+                          ? labelForReturnStatus(returnStatusByOrder.get(order.id))
+                          : <span className="text-neutral-400">—</span>}
+                      </td>
+                    )}
                     <td className="px-4 py-3">
                       <Link
                         href={`/account/orders/${order.id}`}

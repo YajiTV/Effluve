@@ -5,7 +5,6 @@ import { AdminOrder, ORDER_STATUSES } from "@/lib/admin-orders";
 import { eurFromCents } from "@/lib/money";
 import { PaymentStatus } from "@prisma/client";
 
-// Libellés et couleurs pour chaque statut
 const STATUS_LABEL: Record<PaymentStatus, string> = {
   pending_payment: "En attente de paiement",
   paid: "Payée",
@@ -26,25 +25,56 @@ const STATUS_COLOR: Record<PaymentStatus, string> = {
 
 export default function OrdersTable({ initialOrders }: { initialOrders: AdminOrder[] }) {
   const [orders, setOrders] = useState(initialOrders);
-  const [loading, setLoading] = useState<number | null>(null); // id de la commande en cours de mise à jour
+  const [loadingStatus, setLoadingStatus] = useState<number | null>(null);
+  const [loadingLabel, setLoadingLabel] = useState<number | null>(null);
+  const [labelError, setLabelError] = useState<{ id: number; msg: string } | null>(null);
 
   async function handleStatusChange(orderId: number, newStatus: PaymentStatus) {
-    setLoading(orderId);
-
+    setLoadingStatus(orderId);
     const res = await fetch(`/api/admin/orders/${orderId}/status`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status: newStatus }),
     });
-
     if (res.ok) {
-      // Mise à jour locale sans recharger la page
       setOrders((prev) =>
         prev.map((o) => (o.id === orderId ? { ...o, paymentStatus: newStatus } : o))
       );
     }
+    setLoadingStatus(null);
+  }
 
-    setLoading(null);
+  async function handleGenerateLabel(orderId: number) {
+    setLoadingLabel(orderId);
+    setLabelError(null);
+
+    const res = await fetch("/api/shipping/label", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ orderId }),
+    });
+
+    const data = await res.json().catch(() => ({}));
+    setLoadingLabel(null);
+
+    if (!res.ok) {
+      setLabelError({ id: orderId, msg: data.error ?? "Erreur inconnue" });
+      return;
+    }
+
+    setOrders((prev) =>
+      prev.map((o) =>
+        o.id === orderId
+          ? {
+              ...o,
+              trackingNumber: data.trackingNumber,
+              labelUrl: data.labelUrl,
+              carrierName: data.carrierName,
+              paymentStatus: "preparing" as PaymentStatus,
+            }
+          : o
+      )
+    );
   }
 
   return (
@@ -57,7 +87,8 @@ export default function OrdersTable({ initialOrders }: { initialOrders: AdminOrd
             <th className="pb-3 pr-4 font-body text-xs uppercase tracking-widest text-neutral-400">Date</th>
             <th className="pb-3 pr-4 font-body text-xs uppercase tracking-widest text-neutral-400">Articles</th>
             <th className="pb-3 pr-4 font-body text-xs uppercase tracking-widest text-neutral-400">Total</th>
-            <th className="pb-3 font-body text-xs uppercase tracking-widest text-neutral-400">Statut</th>
+            <th className="pb-3 pr-4 font-body text-xs uppercase tracking-widest text-neutral-400">Statut</th>
+            <th className="pb-3 font-body text-xs uppercase tracking-widest text-neutral-400">Livraison</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-neutral-100">
@@ -77,10 +108,10 @@ export default function OrdersTable({ initialOrders }: { initialOrders: AdminOrd
               <td className="py-4 pr-4 font-body text-sm font-medium text-black">
                 {eurFromCents(order.totalCents)} €
               </td>
-              <td className="py-4">
+              <td className="py-4 pr-4">
                 <select
                   value={order.paymentStatus}
-                  disabled={loading === order.id}
+                  disabled={loadingStatus === order.id}
                   onChange={(e) => handleStatusChange(order.id, e.target.value as PaymentStatus)}
                   className={`px-3 py-1.5 text-xs font-body rounded-full border-0 cursor-pointer disabled:opacity-50 ${STATUS_COLOR[order.paymentStatus]}`}
                 >
@@ -90,6 +121,40 @@ export default function OrdersTable({ initialOrders }: { initialOrders: AdminOrd
                     </option>
                   ))}
                 </select>
+              </td>
+              <td className="py-4">
+                {order.trackingNumber ? (
+                  <div className="space-y-1">
+                    <p className="text-xs text-neutral-500">
+                      {order.carrierName} — <span className="font-mono">{order.trackingNumber}</span>
+                    </p>
+                    {order.labelUrl && (
+                      <a
+                        href={order.labelUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs font-semibold text-indigo-600 underline underline-offset-2 hover:text-indigo-800"
+                      >
+                        Télécharger l'étiquette
+                      </a>
+                    )}
+                  </div>
+                ) : order.paymentStatus === "paid" || order.paymentStatus === "preparing" ? (
+                  <div className="space-y-1">
+                    <button
+                      onClick={() => handleGenerateLabel(order.id)}
+                      disabled={loadingLabel === order.id}
+                      className="inline-flex h-8 items-center rounded-lg bg-neutral-900 px-3 text-xs font-semibold text-white hover:bg-black disabled:opacity-50"
+                    >
+                      {loadingLabel === order.id ? "Génération..." : "Générer l'étiquette"}
+                    </button>
+                    {labelError?.id === order.id && (
+                      <p className="text-xs text-red-600">{labelError.msg}</p>
+                    )}
+                  </div>
+                ) : (
+                  <span className="text-xs text-neutral-300">—</span>
+                )}
               </td>
             </tr>
           ))}

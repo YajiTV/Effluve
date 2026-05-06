@@ -17,6 +17,8 @@ export type OrderDetail = {
   totalCents: number;
   paymentStatus: OrderStatus;
   stripeInvoiceUrl: string | null;
+  trackingNumber: string | null;
+  carrierName: string | null;
   shippingAddressId: number;
   billingAddressId: number;
   items: {
@@ -36,6 +38,14 @@ export type PaidOrderForReturn = {
     id: number;
     productName: string;
   }[];
+};
+
+export type PendingOrder = {
+  id: number;
+  orderNumber: string;
+  totalCents: number;
+  createdAt: string;
+  items: { productName: string; quantity: number; unitPriceCents: number }[];
 };
 
 function makeOrderNumber(userId: number) {
@@ -183,6 +193,8 @@ export async function getOrderDetailById(userId: number, orderId: number): Promi
     totalCents: row.totalCents,
     paymentStatus: row.paymentStatus,
     stripeInvoiceUrl: row.stripeInvoiceUrl ?? null,
+    trackingNumber: row.trackingNumber ?? null,
+    carrierName: row.carrierName ?? null,
     shippingAddressId: row.shippingAddressId,
     billingAddressId: row.billingAddressId,
     items: row.items.map((item) => ({
@@ -253,6 +265,26 @@ export async function getOrderInvoiceData(userId: number, orderId: number): Prom
       lineTotalCents: item.lineTotalCents,
     })),
   };
+}
+
+export async function getPendingOrdersByUserId(userId: number): Promise<PendingOrder[]> {
+  const rows = await prisma.order.findMany({
+    where: { userId, paymentStatus: "pending_payment" },
+    include: { items: { orderBy: { id: "asc" } } },
+    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+  });
+
+  return rows.map((row) => ({
+    id: row.id,
+    orderNumber: row.orderNumber,
+    totalCents: row.totalCents,
+    createdAt: row.createdAt.toISOString(),
+    items: row.items.map((item) => ({
+      productName: item.productName,
+      quantity: item.quantity,
+      unitPriceCents: item.unitPriceCents,
+    })),
+  }));
 }
 
 export async function getPaidOrdersWithItemsByUserId(userId: number): Promise<PaidOrderForReturn[]> {

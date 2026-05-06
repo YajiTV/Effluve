@@ -3,6 +3,7 @@ import CheckoutClient from "@/components/checkout/CheckoutClient";
 import { getSessionUser } from "@/lib/auth";
 import { getUserAddresses } from "@/lib/addresses";
 import { getCartItemsByUserId } from "@/lib/cart";
+import { getPendingOrdersByUserId } from "@/lib/orders";
 
 export const dynamic = "force-dynamic";
 
@@ -10,9 +11,10 @@ export default async function CheckoutPage() {
   const user = await getSessionUser();
   if (!user) redirect("/login?next=/checkout");
 
-  const [addresses, cartItems] = await Promise.all([
+  const [addresses, cartItems, pendingOrders] = await Promise.all([
     getUserAddresses(user.id),
     getCartItemsByUserId(user.id),
+    getPendingOrdersByUserId(user.id),
   ]);
 
   return (
@@ -28,7 +30,7 @@ export default async function CheckoutPage() {
           </p>
         </div>
 
-        <CheckoutClient addresses={addresses} cartItems={cartItems} />
+        <CheckoutClient addresses={addresses} cartItems={cartItems} pendingOrders={pendingOrders} />
       </div>
     </main>
   );

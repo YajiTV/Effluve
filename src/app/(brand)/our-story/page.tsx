@@ -34,7 +34,7 @@ export default function NotreHistoirePage() {
             </strong>
           </p>
           <p>
-            Chaque pièce porte une signature discrète - un détail sur la manche, un motif sur le col - rappel silencieux de ce qu&apos;Effluve représente. En boutique, un atelier de personnalisation vous attend : initiales brodées, choix de boutons, ajustements sur mesure. Parce qu&apos;un vêtement doit vous ressembler.
+            Chaque pièce porte une signature discrète, un détail sur la manche, un motif sur le col, rappel silencieux de ce qu&apos;Effluve représente. En boutique, un atelier de personnalisation vous attend : initiales brodées, choix de boutons, ajustements sur mesure. Parce qu&apos;un vêtement doit vous ressembler.
           </p>
         </div>
       </div>

@@ -125,6 +125,9 @@ model Order {
   paymentStatus       PaymentStatus @default(pending_payment) @map("payment_status")
   stripeInvoiceId     String?      @map("stripe_invoice_id") @db.VarChar(255)
   stripeInvoiceUrl    String?      @map("stripe_invoice_url") @db.VarChar(1024)
+  trackingNumber      String?      @map("tracking_number") @db.VarChar(255)
+  labelUrl            String?      @map("label_url") @db.VarChar(1024)
+  carrierName         String?      @map("carrier_name") @db.VarChar(100)
   shippingAddressId   Int          @map("shipping_address_id") @db.Int
   billingAddressId  Int           @map("billing_address_id") @db.Int
   createdAt         DateTime      @default(now()) @map("created_at") @db.Timestamp(0)
