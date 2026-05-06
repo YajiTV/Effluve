@@ -65,13 +65,13 @@ export default function NotFound() {
                     </p>
                     <div className="flex flex-wrap justify-center gap-6">
                         <Link
-                            href="/femme"
+                            href="/women"
                             className="font-body text-sm text-effluve-nero hover:text-effluve-black transition-colors"
                         >
                             Femme
                         </Link>
                         <Link
-                            href="/homme"
+                            href="/men"
                             className="font-body text-sm text-effluve-nero hover:text-effluve-black transition-colors"
                         >
                             Homme

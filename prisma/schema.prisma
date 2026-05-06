@@ -21,6 +21,9 @@ enum ProductCategory {
 enum PaymentStatus {
   pending_payment
   paid
+  preparing
+  shipped
+  delivered
   cancelled
 }
 
@@ -88,6 +91,8 @@ model Product {
   priceCents   Int            @map("pricecents") @db.Int
   imageUrl     String?        @map("imageurl") @db.VarChar(1024)
   category     ProductCategory
+  stock        Int            @default(0) @db.Int
+  sizes        String?        @db.VarChar(100)
   isActive     Boolean        @default(true) @map("isactive")
   createdAt    DateTime       @default(now()) @map("created_at") @db.Timestamp(0)
   cartItems    CartItem[]
@@ -102,11 +107,12 @@ model CartItem {
   userId    Int      @map("user_id") @db.Int
   productId Int      @map("product_id") @db.Int
   quantity  Int      @default(1) @db.Int
+  size      String   @default("") @db.VarChar(10)
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(0)
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade, map: "fk_cart_user")
   product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade, map: "fk_cart_product")
 
-  @@unique([userId, productId], map: "uniq_cart_user_product")
+  @@unique([userId, productId, size], map: "uniq_cart_user_product_size")
   @@index([productId], map: "fk_cart_product")
   @@map("cart_items")
 }
@@ -119,6 +125,9 @@ model Order {
   paymentStatus       PaymentStatus @default(pending_payment) @map("payment_status")
   stripeInvoiceId     String?      @map("stripe_invoice_id") @db.VarChar(255)
   stripeInvoiceUrl    String?      @map("stripe_invoice_url") @db.VarChar(1024)
+  trackingNumber      String?      @map("tracking_number") @db.VarChar(255)
+  labelUrl            String?      @map("label_url") @db.VarChar(1024)
+  carrierName         String?      @map("carrier_name") @db.VarChar(100)
   shippingAddressId   Int          @map("shipping_address_id") @db.Int
   billingAddressId  Int           @map("billing_address_id") @db.Int
   createdAt         DateTime      @default(now()) @map("created_at") @db.Timestamp(0)

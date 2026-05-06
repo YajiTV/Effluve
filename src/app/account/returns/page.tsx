@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import ReturnRequestForm from "@/components/ReturnRequestForm";
+import ReturnRequestForm from "@/components/account/ReturnRequestForm";
 import { getSessionUser } from "@/lib/auth";
 import { eurFromCents } from "@/lib/money";
 import { getPaidOrdersWithItemsByUserId } from "@/lib/orders";

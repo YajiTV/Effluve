@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import AdminReturnsTable from "@/components/AdminReturnsTable";
+import AdminReturnsTable from "@/components/account/AdminReturnsTable";
 import { getSessionUser } from "@/lib/auth";
 import { getAllReturnsForAdmin } from "@/lib/returns";
 

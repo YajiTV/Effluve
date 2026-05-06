@@ -10,6 +10,9 @@ type Params = { params: Promise<{ id: string }> };
 
 function labelForStatus(status: string) {
   if (status === "paid") return "Payé";
+  if (status === "preparing") return "En préparation";
+  if (status === "shipped") return "Expédié";
+  if (status === "delivered") return "Livré";
   if (status === "cancelled") return "Annulé";
   return "En attente de paiement";
 }
@@ -63,6 +66,16 @@ export default async function OrderDetailPage({ params }: Params) {
             <p className="font-semibold text-neutral-900">Total</p>
             <p className="font-semibold text-neutral-900">{eurFromCents(order.totalCents)} €</p>
           </div>
+
+          {order.trackingNumber && (
+            <div className="mt-4 rounded-xl border border-blue-100 bg-blue-50 p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-blue-500 mb-1">Suivi de livraison</p>
+              <p className="text-sm font-semibold text-neutral-900">
+                {order.carrierName && <span className="text-neutral-500 font-normal">{order.carrierName} — </span>}
+                <span className="font-mono">{order.trackingNumber}</span>
+              </p>
+            </div>
+          )}
 
           {order.paymentStatus === "paid" && (
             <div className="mt-6 flex flex-wrap gap-3">
