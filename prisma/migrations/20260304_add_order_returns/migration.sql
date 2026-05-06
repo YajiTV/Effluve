@@ -1,2 +1,0 @@
--- Tables merged into 20260304_init_baseline migration.
--- This migration is intentionally empty.

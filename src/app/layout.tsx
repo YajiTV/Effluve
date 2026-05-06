@@ -10,6 +10,9 @@ export const metadata: Metadata = {
     template: "%s | EFFLUVE",
   },
   description: "EFFLUVE - Boutique e-commerce de parfums.",
+  icons: {
+    icon: '/icon/favicon.ico'
+  }
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

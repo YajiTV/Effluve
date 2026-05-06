@@ -30,8 +30,6 @@ services:
     environment:
       DATABASE_URL: mysql://effluve:effluve@db:3306/effluve
       AUTH_SECRET: effluve
-      PRISMA_API_URL: http://localhost:4010
-      PRISMA_API_TOKEN: change-me-in-production
       NEXT_PUBLIC_API_URL: http://localhost:3000/api
       # Renseigner vos clés Stripe ici ou via un fichier .env
       STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
