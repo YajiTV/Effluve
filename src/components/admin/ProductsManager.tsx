@@ -19,8 +19,10 @@ const EMPTY_FORM = {
   imageUrl: "",
   category: "femme" as ProductCategory,
   stock: "0",
+  stockAlert: "5",
   sizes: "",
   isActive: true,
+  extraImages: "",
 };
 
 type FormState = typeof EMPTY_FORM;
@@ -49,8 +51,12 @@ export default function ProductsManager({ initialProducts }: { initialProducts: 
       imageUrl: product.imageUrl ?? "",
       category: product.category,
       stock: String(product.stock),
+      stockAlert: String(product.stockAlert),
       sizes: product.sizes ?? "",
       isActive: product.isActive,
+      extraImages: product.extraImages
+        ? (JSON.parse(product.extraImages) as string[]).join(", ")
+        : "",
     });
     setShowForm(true);
   }
@@ -59,6 +65,10 @@ export default function ProductsManager({ initialProducts }: { initialProducts: 
   async function handleSave() {
     setSaving(true);
 
+    const extraImagesArr = form.extraImages
+      ? form.extraImages.split(",").map((u) => u.trim()).filter(Boolean)
+      : [];
+
     const payload = {
       name: form.name,
       description: form.description || null,
@@ -66,8 +76,10 @@ export default function ProductsManager({ initialProducts }: { initialProducts: 
       imageUrl: form.imageUrl || null,
       category: form.category,
       stock: parseInt(form.stock, 10),
+      stockAlert: parseInt(form.stockAlert, 10),
       sizes: form.sizes || null,
       isActive: form.isActive,
+      extraImages: extraImagesArr.length > 0 ? JSON.stringify(extraImagesArr) : null,
     };
 
     if (editingId) {
@@ -192,6 +204,16 @@ export default function ProductsManager({ initialProducts }: { initialProducts: 
               />
             </Field>
 
+            <Field label="Seuil d'alerte stock">
+              <input
+                type="number"
+                min="0"
+                value={form.stockAlert}
+                onChange={(e) => setForm({ ...form, stockAlert: e.target.value })}
+                className="input"
+              />
+            </Field>
+
             <Field label="Tailles disponibles (ex: XS,S,M,L,XL)" className="sm:col-span-2">
               <input
                 type="text"
@@ -209,6 +231,16 @@ export default function ProductsManager({ initialProducts }: { initialProducts: 
                 onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
                 className="input"
                 placeholder="https://..."
+              />
+            </Field>
+
+            <Field label="Images supplémentaires (URLs séparées par virgule)" className="sm:col-span-2">
+              <input
+                type="text"
+                value={form.extraImages}
+                onChange={(e) => setForm({ ...form, extraImages: e.target.value })}
+                className="input"
+                placeholder="https://..., https://..."
               />
             </Field>
 

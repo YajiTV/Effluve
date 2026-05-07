@@ -6,7 +6,7 @@ export async function POST(req: Request) {
   try {
     const user = await getSessionUser();
     if (!user) return NextResponse.json({ error: "UNAUTHENTICATED" }, { status: 401 });
-    if (user.role !== "admin") return NextResponse.json({ error: "FORBIDDEN" }, { status: 403 });
+    if (user.role !== "admin" && user.role !== "superadmin") return NextResponse.json({ error: "FORBIDDEN" }, { status: 403 });
 
     const body = (await req.json().catch(() => null)) as { orderId?: number } | null;
     const orderId = Number(body?.orderId);

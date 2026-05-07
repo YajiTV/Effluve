@@ -1,13 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const LS_KEY = "effluve_newsletter_subscribed";
 
 export default function NewsletterForm() {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
-  const [hidden] = useState(() => typeof window !== "undefined" && !!localStorage.getItem(LS_KEY));
+  const [hidden, setHidden] = useState(false);
+
+  useEffect(() => {
+    if (localStorage.getItem(LS_KEY)) setHidden(true);
+  }, []);
 
   if (hidden) return null;
 

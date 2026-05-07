@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import ProductActions from "@/components/product/ProductActions";
 import type { Product } from "@/lib/products";
 import { eurFromCents } from "@/lib/money";
@@ -17,34 +18,37 @@ export default function ProductCard({
   linkTo,
 }: ProductCardProps) {
   const image = product.imageUrl ? (
-    <img
+    <Image
       src={product.imageUrl}
       alt={product.name}
-      className="h-full w-full object-cover"
-      loading="lazy"
+      fill
+      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+      className="object-cover transition-transform duration-500 group-hover:scale-105"
     />
   ) : (
-    <div className="flex h-full w-full items-center justify-center text-sm text-neutral-500">
-      Pas d’image
+    <div className="flex h-full w-full items-center justify-center text-sm text-neutral-400 font-body">
+      Pas d&apos;image
     </div>
   );
 
   const imageBlock = linkTo ? <Link href={linkTo}>{image}</Link> : image;
 
   return (
-    <article className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm hover:shadow-md transition">
-      <div className="aspect-[4/5] w-full bg-neutral-100">{imageBlock}</div>
+    <article className="group overflow-hidden border border-neutral-200 bg-effluve-white hover:border-effluve-nero transition-colors duration-300">
+      <div className="relative aspect-[4/5] w-full bg-neutral-100 overflow-hidden">
+        {imageBlock}
+      </div>
 
-      <div className="p-4">
-        {showCategory ? (
-          <p className="text-xs font-semibold tracking-[0.22em] text-neutral-500 uppercase">
+      <div className="p-4 border-t border-neutral-200">
+        {showCategory && (
+          <p className="font-body text-[10px] uppercase tracking-[0.25em] text-effluve-vanilla mb-2">
             {product.category}
           </p>
-        ) : null}
+        )}
 
-        <h2 className="mt-2 text-base font-semibold text-neutral-900">
+        <h2 className="font-body text-sm font-medium text-effluve-black">
           {linkTo ? (
-            <Link href={linkTo} className="hover:underline underline-offset-2">
+            <Link href={linkTo} className="hover:text-effluve-nero transition-colors">
               {product.name}
             </Link>
           ) : (
@@ -52,12 +56,14 @@ export default function ProductCard({
           )}
         </h2>
 
-        <p className="mt-1 line-clamp-2 text-sm text-neutral-600">
-          {product.description ?? "—"}
-        </p>
+        {product.description && (
+          <p className="font-body mt-1 line-clamp-1 text-xs text-neutral-500">
+            {product.description}
+          </p>
+        )}
 
         <div className="mt-4 flex items-center justify-between">
-          <p className="text-sm font-semibold text-neutral-900">
+          <p className="font-body text-sm text-effluve-black">
             {eurFromCents(product.priceCents)} €
           </p>
 
@@ -71,7 +77,7 @@ export default function ProductCard({
           ) : linkTo ? (
             <Link
               href={linkTo}
-              className="text-sm font-semibold text-neutral-900 underline underline-offset-4 hover:text-neutral-700"
+              className="font-body text-xs uppercase tracking-[0.15em] text-effluve-nero underline underline-offset-4 hover:text-effluve-black transition-colors"
             >
               Voir
             </Link>

@@ -6,7 +6,7 @@ const SECTIONS = [
   {
     titre: "Responsable du traitement",
     contenu: [
-      "EFFLUVE SAS, 12 rue pres dici, 31000 Toulouse — contact@effluve.fr",
+      "EFFLUVE SAS, 12 rue pres dici, 31000 Toulouse, contact@effluve.fr",
     ],
   },
   {
@@ -16,44 +16,44 @@ const SECTIONS = [
       "• Données d'identification : nom, prénom, adresse e-mail, mot de passe (chiffré)",
       "• Données de livraison : adresse postale, numéro de téléphone",
       "• Données de commande : historique d'achats, retours, factures",
-      "• Données de navigation : adresse IP, cookies de session",
+      "• Données de navigation : cookies de session",
     ],
   },
   {
     titre: "Finalités du traitement",
     contenu: [
       "Vos données sont utilisées pour :",
-      "• Gérer votre compte client et vos commandes",
-      "• Traiter les paiements (via Stripe — aucune donnée bancaire n'est stockée sur nos serveurs)",
-      "• Vous envoyer des confirmations de commande et factures",
-      "• Vous adresser notre newsletter si vous y avez consenti",
-      "• Respecter nos obligations légales (comptabilité, litiges)",
+      "- Gérer votre compte client et vos commandes",
+      "-Traiter les paiements (via Stripe, aucune donnée bancaire n'est stockée sur nos serveurs)",
+      "- Vous envoyer des confirmations de commande et factures",
+      "- Vous adresser notre newsletter si vous y avez consenti",
+      "- Respecter nos obligations légales (comptabilité, litiges)",
     ],
   },
   {
     titre: "Base légale",
     contenu: [
-      "• Exécution du contrat : traitement des commandes, livraisons, retours",
-      "• Consentement : newsletter, cookies non essentiels",
-      "• Obligation légale : conservation des données de facturation (10 ans)",
+      "- Exécution du contrat : traitement des commandes, livraisons, retours",
+      "- Consentement : newsletter, cookies non essentiels",
+      "- Obligation légale : conservation des données de facturation (10 ans)",
     ],
   },
   {
     titre: "Durée de conservation",
     contenu: [
-      "• Données de compte actif : durée de la relation commerciale",
-      "• Données de commande et factures : 10 ans (obligation comptable)",
-      "• Données newsletter : jusqu'au désabonnement",
-      "• Cookies de session : supprimés à la fermeture du navigateur",
+      "- Données de compte actif : durée de la relation commerciale",
+      "- Données de commande et factures : 10 ans (obligation comptable)",
+      "- Données newsletter : jusqu'au désabonnement",
+      "- Cookies de session : supprimés à la fermeture du navigateur",
     ],
   },
   {
     titre: "Partage des données",
     contenu: [
       "Nous ne vendons jamais vos données. Elles peuvent être partagées avec :",
-      "• Stripe (paiement en ligne) — politique : stripe.com/fr/privacy",
-      "• Prestataires de livraison (transporteurs)",
-      "• Hébergeur Vercel (infrastructure technique)",
+      "- Stripe (paiement en ligne) politique : stripe.com/fr/privacy",
+      "- Prestataires de livraison (transporteurs)",
+      "- Hébergeur (YajiTV)",
       "Ces prestataires agissent en tant que sous-traitants et sont soumis à des obligations de confidentialité strictes.",
     ],
   },
@@ -61,12 +61,12 @@ const SECTIONS = [
     titre: "Vos droits",
     contenu: [
       "Conformément au RGPD, vous disposez des droits suivants :",
-      "• Droit d'accès à vos données",
-      "• Droit de rectification",
-      "• Droit à l'effacement (droit à l'oubli)",
-      "• Droit à la portabilité",
-      "• Droit d'opposition au traitement",
-      "• Droit de retirer votre consentement à tout moment",
+      "- Droit d'accès à vos données",
+      "- Droit de rectification",
+      "- Droit à l'effacement (droit à l'oubli)",
+      "- Droit à la portabilité",
+      "- Droit d'opposition au traitement",
+      "- Droit de retirer votre consentement à tout moment",
       "Pour exercer ces droits : rh@effluve.fr ou via votre espace compte.",
       "Vous pouvez également introduire une réclamation auprès de la CNIL (cnil.fr).",
     ],
@@ -86,7 +86,7 @@ export default function ConfidentialitePage() {
         <h1 className="font-title text-5xl text-effluve-black mb-2">
           Politique de confidentialité
         </h1>
-        <p className="font-body text-xs text-gray-400 mb-10">Dernière mise à jour : mars 2026</p>
+        <p className="font-body text-xs text-gray-400 mb-10">Dernière mise à jour : mai 2026</p>
 
         <div className="space-y-10 font-body text-effluve-nero text-sm leading-relaxed">
           {SECTIONS.map(({ titre, contenu }) => (

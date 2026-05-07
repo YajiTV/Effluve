@@ -40,7 +40,7 @@ export async function POST(req: Request) {
       fullName: safeName,
       role: 'customer',
     },
-    select: { id: true, email: true, fullName: true, role: true },
+    select: { id: true, email: true, fullName: true, role: true, tokenVersion: true },
   });
 
   const user = {
@@ -49,7 +49,7 @@ export async function POST(req: Request) {
     full_name: created.fullName,
     role: created.role,
   };
-  const token = await signSession(user);
+  const token = await signSession(user, created.tokenVersion);
 
   const res = NextResponse.json({ ok: true, user });
   res.cookies.set(sessionCookie.name, token, sessionCookie.options);

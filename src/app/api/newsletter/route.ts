@@ -1,8 +1,14 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getResendClient, getFromAddress } from "@/lib/resend";
+import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
 export async function POST(req: Request) {
+  const ip = getClientIp(req);
+  if (!rateLimit(`newsletter:${ip}`, 5, 60 * 60 * 1000)) {
+    return NextResponse.json({ error: "Trop de tentatives." }, { status: 429 });
+  }
+
   const body = await req.json().catch(() => null);
   const email = String(body?.email ?? "").trim().toLowerCase();
 
@@ -10,11 +16,15 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Email invalide" }, { status: 400 });
   }
 
-  await prisma.newsletterSubscriber.upsert({
+  const token = crypto.randomUUID();
+
+  const subscriber = await prisma.newsletterSubscriber.upsert({
     where: { email },
-    update: {},
-    create: { email },
+    update: { unsubscribeToken: token },
+    create: { email, unsubscribeToken: token },
   });
+
+  const unsubscribeUrl = `https://effluve.fr/newsletter/unsubscribe?token=${subscriber.unsubscribeToken}`;
 
   const resend = getResendClient();
   const { error } = await resend.emails.send({
@@ -32,7 +42,7 @@ export async function POST(req: Request) {
         <hr style="border:none;border-top:1px solid #eee;margin:32px 0"/>
         <p style="font-size:12px;color:#999">
           Tu reçois cet email car tu t'es inscrit(e) sur effluve.fr.<br/>
-          Pour te désinscrire, réponds à cet email.
+          <a href="${unsubscribeUrl}" style="color:#999">Se désinscrire</a>
         </p>
       </div>
     `,

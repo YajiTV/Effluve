@@ -4,6 +4,15 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { eurFromCents } from "@/lib/money";
 
+const PALIER = 1000;
+const LOYALTY_DISCOUNT_PCT = 20;
+
+type AppliedPromo = {
+  code: string;
+  discountCents: number;
+  description: string;
+};
+
 type Address = {
   id: number;
   firstName: string;
@@ -193,10 +202,12 @@ export default function CheckoutClient({
   addresses: initialAddresses,
   cartItems,
   pendingOrders = [],
+  loyaltyPoints = 0,
 }: {
   addresses: Address[];
   cartItems: CartItem[];
   pendingOrders?: PendingOrder[];
+  loyaltyPoints?: number;
 }) {
   const router = useRouter();
   const [addresses, setAddresses] = useState<Address[]>(initialAddresses);
@@ -208,6 +219,14 @@ export default function CheckoutClient({
   const [billingAddressId, setBillingAddressId] = useState(
     defaultAddressId(initialAddresses, "billing")
   );
+
+  const hasLoyaltyPalier = loyaltyPoints >= PALIER;
+  const [useLoyalty, setUseLoyalty] = useState(hasLoyaltyPalier);
+
+  const [promoInput, setPromoInput] = useState("");
+  const [promoValidating, setPromoValidating] = useState(false);
+  const [promoError, setPromoError] = useState<string | null>(null);
+  const [appliedPromo, setAppliedPromo] = useState<AppliedPromo | null>(null);
 
   const [creating, setCreating] = useState(false);
   const [paying, setPaying] = useState(false);
@@ -222,10 +241,54 @@ export default function CheckoutClient({
   const [cancellingId, setCancellingId] = useState<number | null>(null);
   const [localPendingOrders, setLocalPendingOrders] = useState<PendingOrder[]>(pendingOrders);
 
-  const totalCents = useMemo(
+  const subTotalCents = useMemo(
     () => cartItems.reduce((sum, item) => sum + item.pricecents * item.quantity, 0),
     [cartItems]
   );
+
+  const promoDiscountCents = appliedPromo?.discountCents ?? 0;
+  const afterPromoCents = Math.max(0, subTotalCents - promoDiscountCents);
+  const loyaltyDiscountCents = useLoyalty && hasLoyaltyPalier
+    ? Math.floor(afterPromoCents * LOYALTY_DISCOUNT_PCT / 100)
+    : 0;
+
+  const totalCents = useMemo(
+    () => Math.max(0, subTotalCents - promoDiscountCents - loyaltyDiscountCents),
+    [subTotalCents, promoDiscountCents, loyaltyDiscountCents]
+  );
+
+  const applyPromo = async () => {
+    const code = promoInput.trim().toUpperCase();
+    if (!code) return;
+    setPromoError(null);
+    setPromoValidating(true);
+
+    const res = await fetch("/api/promo/validate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code, orderTotalCents: subTotalCents }),
+    }).catch(() => null);
+
+    setPromoValidating(false);
+
+    if (!res?.ok) {
+      setPromoError("Impossible de valider le code.");
+      return;
+    }
+
+    const data = await res.json() as
+      | { valid: true; discountCents: number; code: string; description: string }
+      | { valid: false; error: string };
+
+    if (!data.valid) {
+      setPromoError(data.error);
+      setAppliedPromo(null);
+      return;
+    }
+
+    setAppliedPromo({ code: data.code, discountCents: data.discountCents, description: data.description });
+    setPromoInput("");
+  };
 
   /* Après ajout d'adresse inline */
   const handleAddressSaved = (next: Address[]) => {
@@ -245,7 +308,12 @@ export default function CheckoutClient({
     const res = await fetch("/api/checkout/create-order", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ shippingAddressId, billingAddressId }),
+      body: JSON.stringify({
+        shippingAddressId,
+        billingAddressId,
+        ...(appliedPromo ? { promoCode: appliedPromo.code } : {}),
+        useLoyalty: useLoyalty && hasLoyaltyPalier,
+      }),
     }).catch(() => null);
 
     setCreating(false);
@@ -563,6 +631,67 @@ export default function CheckoutClient({
               ))}
             </div>
 
+            {/* ── Palier fidélité ── */}
+            {!createdOrder && hasLoyaltyPalier && (
+              <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-sm font-semibold text-amber-900">
+                    Palier fidélité atteint — {loyaltyPoints.toLocaleString("fr-FR")} points
+                  </p>
+                  <p className="mt-0.5 text-xs text-amber-700">
+                    {LOYALTY_DISCOUNT_PCT}% de réduction sur votre commande ({eurFromCents(loyaltyDiscountCents)} €)
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setUseLoyalty((v) => !v)}
+                  className={`shrink-0 mt-0.5 text-xs font-semibold underline ${useLoyalty ? "text-amber-700" : "text-neutral-400"}`}
+                >
+                  {useLoyalty ? "Retirer" : "Appliquer"}
+                </button>
+              </div>
+            )}
+
+            {/* ── Code promo ── */}
+            {!createdOrder && (
+              <div className="space-y-2">
+                <div className="flex gap-2">
+                  <input
+                    className="flex-1 rounded-xl border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-neutral-900"
+                    placeholder="Code promo"
+                    value={promoInput}
+                    onChange={(e) => setPromoInput(e.target.value.toUpperCase())}
+                    onKeyDown={(e) => e.key === "Enter" && applyPromo()}
+                    disabled={!!appliedPromo}
+                  />
+                  {!appliedPromo ? (
+                    <button
+                      type="button"
+                      onClick={applyPromo}
+                      disabled={promoValidating || !promoInput.trim()}
+                      className="h-10 rounded-xl border border-neutral-300 bg-white px-4 text-sm font-semibold text-neutral-900 hover:border-neutral-900 disabled:opacity-50"
+                    >
+                      {promoValidating ? "..." : "Appliquer"}
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setAppliedPromo(null)}
+                      className="h-10 rounded-xl border border-neutral-300 bg-white px-4 text-sm font-semibold text-neutral-600 hover:border-neutral-900"
+                    >
+                      Retirer
+                    </button>
+                  )}
+                </div>
+                {promoError && <p className="text-xs text-red-600">{promoError}</p>}
+                {appliedPromo && (
+                  <p className="text-xs font-semibold text-green-700">
+                    -{eurFromCents(appliedPromo.discountCents)} € — {appliedPromo.description}
+                  </p>
+                )}
+              </div>
+            )}
+
             {/* ── Actions commande / paiement ── */}
             {!createdOrder ? (
               <button
@@ -622,8 +751,20 @@ export default function CheckoutClient({
         <div className="mt-3 space-y-2 text-sm text-neutral-700">
           <div className="flex items-center justify-between">
             <span>Sous-total</span>
-            <span>{eurFromCents(totalCents)} €</span>
+            <span>{eurFromCents(subTotalCents)} €</span>
           </div>
+          {appliedPromo && (
+            <div className="flex items-center justify-between text-green-700 font-medium">
+              <span>Réduction ({appliedPromo.code})</span>
+              <span>-{eurFromCents(promoDiscountCents)} €</span>
+            </div>
+          )}
+          {loyaltyDiscountCents > 0 && (
+            <div className="flex items-center justify-between text-amber-700 font-medium">
+              <span>Fidélité (-{LOYALTY_DISCOUNT_PCT}%)</span>
+              <span>-{eurFromCents(loyaltyDiscountCents)} €</span>
+            </div>
+          )}
           <div className="flex items-center justify-between">
             <span>Livraison</span>
             <span>Offerte</span>
@@ -631,7 +772,7 @@ export default function CheckoutClient({
         </div>
         <div className="my-4 h-px w-full bg-neutral-200" />
         <div className="flex items-center justify-between font-semibold text-neutral-900">
-          <span>Total</span>
+          <span>Total TTC</span>
           <span>{eurFromCents(totalCents)} €</span>
         </div>
       </aside>

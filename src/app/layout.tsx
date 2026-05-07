@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     default: "EFFLUVE",
     template: "%s | EFFLUVE",
   },
-  description: "EFFLUVE - Boutique e-commerce de parfums.",
+  description: "EFFLUVE : Boutique e-commerce de parfums.",
   icons: {
     icon: '/icon/favicon.ico'
   }

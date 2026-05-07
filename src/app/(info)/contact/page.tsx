@@ -31,7 +31,7 @@ export default function ContactPage() {
             <p className="text-sm leading-relaxed">
               EFFLUVE SAS<br />
               12 rue pres dici<br />
-              31000 Toulouse — France
+              31000 Toulouse, France
             </p>
           </section>
         </div>

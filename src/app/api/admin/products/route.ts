@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth";
 import { createProduct } from "@/lib/admin-products";
+import { createAdminLog } from "@/lib/admin-log";
 
 export async function POST(req: NextRequest) {
   const user = await getSessionUser();
-  if (!user || user.role !== "admin") {
+  if (!user || user.role !== "admin" && user.role !== "superadmin") {
     return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
   }
 
@@ -17,6 +18,13 @@ export async function POST(req: NextRequest) {
     category: body.category,
     stock: Number(body.stock),
     isActive: Boolean(body.isActive),
+  });
+
+  await createAdminLog({
+    adminId: user.id,
+    action: "product.created",
+    target: `product:${product.id}`,
+    details: JSON.stringify({ name: product.name, category: product.category }),
   });
 
   return NextResponse.json(product, { status: 201 });

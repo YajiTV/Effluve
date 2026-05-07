@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 export default async function AdminReturnsPage() {
   const user = await getSessionUser();
   if (!user) redirect("/login?next=/admin/returns");
-  if (user.role !== "admin") redirect("/account");
+  if (user.role !== "admin" && user.role !== "superadmin") redirect("/account");
 
   const rows = await getAllReturnsForAdmin();
 

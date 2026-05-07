@@ -29,7 +29,7 @@ export default function Footer() {
   return (
     <footer className="mt-20 w-full bg-[#070707] text-[#d2d2d2]">
       <div className="mx-auto w-full max-w-[1800px] px-6 py-8 lg:px-12 lg:py-10">
-        <section className="mx-auto flex w-full aspect-[16/9] min-h-[680px] flex-col rounded-2xl border border-[#1a1a1a] bg-[#090909] p-6 sm:p-8 lg:p-12">
+        <section className="mx-auto flex w-full aspect-video min-h-[680px] flex-col rounded-2xl border border-[#1a1a1a] bg-[#090909] p-6 sm:p-8 lg:p-12">
 
           {/* Newsletter */}
           <NewsletterForm />

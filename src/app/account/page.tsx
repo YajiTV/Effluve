@@ -3,10 +3,13 @@ import { redirect } from 'next/navigation';
 import { User, Package, MapPin, Heart, RotateCcw, Shield } from 'lucide-react';
 import { getSessionUser } from '@/lib/auth';
 import LogoutButton from '@/components/ui/LogoutButton';
+import { getLoyaltyPoints, PALIER, LOYALTY_DISCOUNT_PCT } from '@/lib/loyalty';
 
 export default async function AccountPage() {
   const user = await getSessionUser();
   if (!user) redirect('/login');
+
+  const loyaltyPoints = await getLoyaltyPoints(user.id);
 
   const [firstName, ...rest] = user.full_name.split(' ');
   const lastName = rest.join(' ');
@@ -55,7 +58,7 @@ export default async function AccountPage() {
                 Mes retours
               </Link>
 
-              {user.role === 'admin' && (
+              {(user.role === 'admin' || user.role === 'superadmin') && (
                 <Link href="/admin/" className="flex items-center gap-3 px-4 py-3 font-body text-sm text-neutral-700 hover:bg-neutral-50 rounded transition-colors">
                   <Shield className="w-5 h-5" strokeWidth={1.5} />
                   Dashboard admin
@@ -66,18 +69,56 @@ export default async function AccountPage() {
             </nav>
           </aside>
 
-          <div className="lg:col-span-3">
+          <div className="lg:col-span-3 space-y-6">
             <div className="bg-white border border-neutral-200 p-8">
               <h2 className="font-title text-2xl text-black mb-6">Informations personnelles</h2>
 
               <div className="space-y-2 font-body text-neutral-700">
                 <p><span className="text-neutral-500">Nom :</span> {user.full_name}</p>
                 <p><span className="text-neutral-500">Email :</span> {user.email}</p>
-                {user.role === 'admin' && (
-                   <p><span className="text-neutral-500">Rôle :</span> {user.role}</p>
-      )}
+                {(user.role === 'admin' || user.role === 'superadmin') && (
+                  <p><span className="text-neutral-500">Rôle :</span> {user.role}</p>
+                )}
               </div>
             </div>
+
+            {(() => {
+              const paliersDisponibles = Math.floor(loyaltyPoints / PALIER);
+              const pointsRestants = loyaltyPoints % PALIER;
+              const progressPct = Math.round((pointsRestants / PALIER) * 100);
+
+              return (
+                <div className="bg-white border border-neutral-200 p-8">
+                  <h2 className="font-title text-2xl text-black mb-1">Fidélité</h2>
+                  <p className="font-body text-xs text-neutral-400 mb-6">10 points par euro dépensé · 1 000 points = -{LOYALTY_DISCOUNT_PCT}% sur une commande</p>
+
+                  <div className="flex items-end justify-between mb-3">
+                    <span className="font-title text-3xl text-black">
+                      {loyaltyPoints.toLocaleString("fr-FR")} points
+                    </span>
+                    {paliersDisponibles > 0 ? (
+                      <span className="font-body text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-3 py-1 rounded-full">
+                        {paliersDisponibles} palier{paliersDisponibles > 1 ? "s" : ""} disponible{paliersDisponibles > 1 ? "s" : ""} -{LOYALTY_DISCOUNT_PCT}% à l&apos;achat
+                      </span>
+                    ) : (
+                      <span className="font-body text-xs text-neutral-500">
+                        Prochain palier dans {PALIER - pointsRestants} pts
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="h-1.5 w-full bg-neutral-100 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-black rounded-full transition-all"
+                      style={{ width: `${progressPct}%` }}
+                    />
+                  </div>
+                  <p className="mt-2 font-body text-xs text-neutral-400">
+                    {pointsRestants.toLocaleString("fr-FR")} / {PALIER.toLocaleString("fr-FR")} points vers le prochain palier
+                  </p>
+                </div>
+              );
+            })()}
           </div>
         </div>
       </div>

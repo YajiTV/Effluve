@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { computeLoyaltyDiscount, consumeLoyaltyPalier, PALIER } from "@/lib/loyalty";
 
 export type OrderStatus = "pending_payment" | "paid" | "preparing" | "shipped" | "delivered" | "cancelled";
 
@@ -57,8 +58,11 @@ export async function createOrderFromCart(params: {
   userId: number;
   shippingAddressId: number;
   billingAddressId: number;
+  promoCode?: string;
+  discountCents?: number;
+  useLoyaltyPalier?: boolean;
 }) {
-  const { userId, shippingAddressId, billingAddressId } = params;
+  const { userId, shippingAddressId, billingAddressId, promoCode, discountCents: rawDiscount, useLoyaltyPalier } = params;
   const orderNumber = makeOrderNumber(userId);
 
   return prisma.$transaction(async (tx) => {
@@ -92,7 +96,21 @@ export async function createOrderFromCart(params: {
       throw new Error("ADRESSE_INVALIDE");
     }
 
-    const totalCents = cartItems.reduce((sum, row) => sum + row.product.priceCents * row.quantity, 0);
+    const subTotalCents = cartItems.reduce((sum, row) => sum + row.product.priceCents * row.quantity, 0);
+
+    // Vérifie que le palier fidélité est bien disponible avant de l'appliquer
+    let loyaltyDiscountCents = 0;
+    if (useLoyaltyPalier) {
+      const user = await tx.user.findUnique({ where: { id: userId }, select: { loyaltyPoints: true } });
+      if ((user?.loyaltyPoints ?? 0) >= PALIER) {
+        loyaltyDiscountCents = computeLoyaltyDiscount(subTotalCents - Math.max(0, Math.min(rawDiscount ?? 0, subTotalCents)));
+        await consumeLoyaltyPalier(userId, tx);
+      }
+    }
+
+    const promoDicount = Math.max(0, Math.min(rawDiscount ?? 0, subTotalCents));
+    const discountCents = Math.min(promoDicount + loyaltyDiscountCents, subTotalCents);
+    const totalCents = subTotalCents - discountCents;
 
     const order = await tx.order.create({
       data: {
@@ -102,6 +120,8 @@ export async function createOrderFromCart(params: {
         paymentStatus: "pending_payment",
         shippingAddressId,
         billingAddressId,
+        ...(promoCode ? { promoCode } : {}),
+        ...(discountCents > 0 ? { discountCents } : {}),
       },
     });
 

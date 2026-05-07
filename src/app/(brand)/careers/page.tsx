@@ -1,7 +1,7 @@
 const POSTES = [
-  { titre: "Styliste senior", type: "CDD — Toulouse", desc: "Conception des collections femme et homme, de l'esquisse à l'industrialisation." },
-  { titre: "Développeur(se) e-commerce", type: "CDD — Hybride", desc: "Stack Next.js / TypeScript / Prisma. Amélioration de l'expérience d'achat en ligne." },
-  { titre: "Chargé(e) de communication", type: "CDD — Toulouse", desc: "Gestion des réseaux sociaux, partenariats presse et contenu éditorial." },
+  { titre: "Styliste senior", type: "CDD Toulouse", desc: "Conception des collections femme et homme, de l'esquisse à l'industrialisation." },
+  { titre: "Développeur(se) e-commerce", type: "CDD Hybride", desc: "Stack Next.js / TypeScript / Prisma. Amélioration de l'expérience d'achat en ligne." },
+  { titre: "Chargé(e) de communication", type: "CDD Toulouse", desc: "Gestion des réseaux sociaux, partenariats presse et contenu éditorial." },
 ];
 
 export default function RecrutementPage() {

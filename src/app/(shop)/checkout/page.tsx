@@ -4,6 +4,7 @@ import { getSessionUser } from "@/lib/auth";
 import { getUserAddresses } from "@/lib/addresses";
 import { getCartItemsByUserId } from "@/lib/cart";
 import { getPendingOrdersByUserId } from "@/lib/orders";
+import { getLoyaltyPoints } from "@/lib/loyalty";
 
 export const dynamic = "force-dynamic";
 
@@ -11,10 +12,11 @@ export default async function CheckoutPage() {
   const user = await getSessionUser();
   if (!user) redirect("/login?next=/checkout");
 
-  const [addresses, cartItems, pendingOrders] = await Promise.all([
+  const [addresses, cartItems, pendingOrders, loyaltyPoints] = await Promise.all([
     getUserAddresses(user.id),
     getCartItemsByUserId(user.id),
     getPendingOrdersByUserId(user.id),
+    getLoyaltyPoints(user.id),
   ]);
 
   return (
@@ -30,7 +32,7 @@ export default async function CheckoutPage() {
           </p>
         </div>
 
-        <CheckoutClient addresses={addresses} cartItems={cartItems} pendingOrders={pendingOrders} />
+        <CheckoutClient addresses={addresses} cartItems={cartItems} pendingOrders={pendingOrders} loyaltyPoints={loyaltyPoints} />
       </div>
     </main>
   );

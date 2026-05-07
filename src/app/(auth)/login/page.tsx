@@ -8,7 +8,13 @@ export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(() => {
+    if (typeof window === 'undefined') return null;
+    const params = new URLSearchParams(window.location.search);
+    return params.get('error') === 'reset_expired'
+      ? 'Votre lien de réinitialisation a expiré. Reconnectez-vous avec le mot de passe temporaire fourni par l\'administrateur.'
+      : null;
+  });
   const [loading, setLoading] = useState(false);
 
   async function onSubmit(e: React.FormEvent) {
@@ -26,6 +32,11 @@ export default function LoginPage() {
     setLoading(false);
 
     if (!res.ok) return setError(data?.error ?? 'Erreur');
+
+    if (data?.mustResetPassword) {
+      router.push('/reset-password');
+      return;
+    }
 
     const nextPath = new URLSearchParams(window.location.search).get('next') || '/account';
     router.push(nextPath);

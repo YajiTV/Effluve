@@ -9,8 +9,10 @@ export type AdminProduct = {
   imageUrl: string | null;
   category: ProductCategory;
   stock: number;
+  stockAlert: number;
   isActive: boolean;
   sizes: string | null;
+  extraImages: string | null;
 };
 
 export type ProductPayload = {
@@ -20,8 +22,10 @@ export type ProductPayload = {
   imageUrl?: string;
   category: ProductCategory;
   stock: number;
+  stockAlert?: number;
   isActive: boolean;
   sizes?: string | null;
+  extraImages?: string | null;
 };
 
 export async function getAllProductsForAdmin(): Promise<AdminProduct[]> {
@@ -35,11 +39,13 @@ export async function getAllProductsForAdmin(): Promise<AdminProduct[]> {
       imageUrl: true,
       category: true,
       stock: true,
+      stockAlert: true,
       isActive: true,
       sizes: true,
+      extraImages: true,
     },
   });
-  return rows.map((r) => ({ ...r, sizes: r.sizes ?? null }));
+  return rows.map((r) => ({ ...r, sizes: r.sizes ?? null, extraImages: r.extraImages ?? null }));
 }
 
 export async function createProduct(data: ProductPayload) {
