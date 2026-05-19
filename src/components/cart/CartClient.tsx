@@ -241,7 +241,7 @@ export default function CartClient({
               )}
 
               <Link
-                href="/checkout"
+                href="/commande"
                 className={[
                   "mt-4 inline-flex h-11 w-full items-center justify-center rounded-xl text-sm font-semibold",
                   items.length && !hasOutOfStock

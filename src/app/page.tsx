@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import HeroBanner from "@/components/layout/HeroBanner";
 
 export const dynamic = "force-dynamic";
 
@@ -8,43 +9,7 @@ export default function HomePage() {
     <main className="bg-effluve-white">
 
       {/* ── Hero plein écran ── */}
-      <section className="relative h-screen min-h-[640px] w-full overflow-hidden">
-        <Image
-          src="/images/bannerhero.png"
-          alt="Effluve — Collection"
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover object-center"
-        />
-
-        {/* Overlay léger — juste pour les boutons en bas */}
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-
-        {/* CTA positionné en bas, image parle d'elle-même */}
-        <div className="absolute bottom-20 left-0 right-0 flex flex-wrap gap-3 justify-center px-6">
-          <Link
-            href="/collection"
-            className="font-body inline-flex h-12 items-center px-10 text-[10px] uppercase tracking-[0.3em] bg-effluve-vanilla text-effluve-nero hover:bg-effluve-white hover:text-effluve-black transition-all duration-300"
-          >
-            Découvrir la collection
-          </Link>
-          <Link
-            href="/women"
-            className="font-body inline-flex h-12 items-center px-10 text-[10px] uppercase tracking-[0.3em] border border-white/60 text-white hover:border-effluve-vanilla hover:text-effluve-vanilla transition-all duration-300"
-          >
-            Femme
-          </Link>
-          <Link
-            href="/men"
-            className="font-body inline-flex h-12 items-center px-10 text-[10px] uppercase tracking-[0.3em] border border-white/60 text-white hover:border-effluve-vanilla hover:text-effluve-vanilla transition-all duration-300"
-          >
-            Homme
-          </Link>
-        </div>
-
-
-      </section>
+      <HeroBanner />
 
       {/* ── Bandeau valeurs ── */}
       <section className="border-y border-neutral-100 bg-effluve-white">
@@ -73,9 +38,9 @@ export default function HomePage() {
       <section className="grid grid-cols-1 md:grid-cols-2 h-[80vh] min-h-[500px]">
 
         {/* Femme */}
-        <Link href="/women" className="group relative overflow-hidden">
+        <Link href="/femme" className="group relative overflow-hidden">
           <Image
-            src="/images/img5.png"
+            src="/images/img4.png"
             alt="Collection Femme"
             fill
             sizes="50vw"
@@ -93,9 +58,9 @@ export default function HomePage() {
         </Link>
 
         {/* Homme */}
-        <Link href="/men" className="group relative overflow-hidden">
+        <Link href="/homme" className="group relative overflow-hidden">
           <Image
-            src="/images/img2.png"
+            src="/images/img3.png"
             alt="Collection Homme"
             fill
             sizes="50vw"
@@ -143,7 +108,7 @@ export default function HomePage() {
             naturelles et des méthodes artisanales.
           </p>
           <Link
-            href="/our-story"
+            href="/notre-histoire"
             className="font-body mt-10 inline-flex items-center gap-3 text-[10px] uppercase tracking-[0.3em] text-effluve-vanilla hover:text-effluve-white transition-colors duration-300 group"
           >
             Lire notre histoire

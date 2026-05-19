@@ -3,13 +3,14 @@ import { getSessionUser } from "@/lib/auth";
 import { getAllProductsForAdmin } from "@/lib/admin-products";
 import { getLowStockProducts } from "@/lib/products";
 import ProductsManager from "@/components/admin/ProductsManager";
+import BackButton from "@/components/admin/BackButton";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminProductsPage() {
   const user = await getSessionUser();
-  if (!user) redirect("/login?next=/admin/products");
-  if (user.role !== "admin" && user.role !== "superadmin") redirect("/account");
+  if (!user) redirect("/connexion?next=/admin/products");
+  if (user.role !== "admin" && user.role !== "superadmin") redirect("/compte");
 
   const [products, lowStockProducts] = await Promise.all([
     getAllProductsForAdmin(),
@@ -20,7 +21,8 @@ export default async function AdminProductsPage() {
     <main className="min-h-screen bg-neutral-50 px-4 py-12 sm:px-6 lg:px-12">
       <div className="mx-auto max-w-7xl space-y-6">
         <div>
-          <h1 className="font-title text-4xl text-black">Gestion des produits</h1>
+          <BackButton />
+          <h1 className="mt-4 font-title text-4xl text-black">Gestion des produits</h1>
           <p className="mt-2 text-sm text-neutral-500">
             {products.length} produit{products.length > 1 ? "s" : ""} au total
           </p>

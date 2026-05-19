@@ -30,7 +30,7 @@ export default function SearchFilters({ total }: { total: number }) {
       } else {
         next.delete(key);
       }
-      router.push(`/search?${next.toString()}`);
+      router.push(`/recherche?${next.toString()}`);
     },
     [router, params]
   );
@@ -47,7 +47,7 @@ export default function SearchFilters({ total }: { total: number }) {
     const next = new URLSearchParams();
     const q = params.get("q");
     if (q) next.set("q", q);
-    router.push(`/search?${next.toString()}`);
+    router.push(`/recherche?${next.toString()}`);
   }
 
   return (

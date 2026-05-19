@@ -137,6 +137,7 @@ model Order {
   carrierName         String?      @map("carrier_name") @db.VarChar(100)
   promoCode           String?      @map("promo_code") @db.VarChar(50)
   discountCents       Int          @default(0) @map("discount_cents") @db.Int
+  shippingCostCents   Int          @default(0) @map("shipping_cost_cents") @db.UnsignedInt
   shippingAddressId   Int          @map("shipping_address_id") @db.Int
   billingAddressId  Int           @map("billing_address_id") @db.Int
   createdAt         DateTime      @default(now()) @map("created_at") @db.Timestamp(0)

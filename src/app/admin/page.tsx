@@ -11,8 +11,8 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminPage() {
   const user = await getSessionUser();
-  if (!user) redirect("/login?next=/admin");
-  if (user.role !== "admin" && user.role !== "superadmin") redirect("/account");
+  if (!user) redirect("/connexion?next=/admin");
+  if (user.role !== "admin" && user.role !== "superadmin") redirect("/compte");
 
   const [kpis, weeklyRevenue, recentOrders, lowStock] = await Promise.all([
     getDashboardKPIs(),

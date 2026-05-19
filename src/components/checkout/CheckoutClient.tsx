@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { eurFromCents } from "@/lib/money";
 
@@ -40,6 +40,7 @@ type CreatedOrder = {
   orderId: number;
   orderNumber: string;
   totalCents: number;
+  shippingCostCents: number;
   paymentStatus: "pending_payment";
 };
 
@@ -228,6 +229,42 @@ export default function CheckoutClient({
   const [promoError, setPromoError] = useState<string | null>(null);
   const [appliedPromo, setAppliedPromo] = useState<AppliedPromo | null>(null);
 
+  const [shippingCostCents, setShippingCostCents] = useState<number | null>(null);
+  const [shippingLoading, setShippingLoading] = useState(false);
+  const shippingAbortRef = useRef<AbortController | null>(null);
+
+  const totalItemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+
+  const fetchShippingEstimate = useCallback(
+    async (addressId: number) => {
+      if (!addressId) return;
+      shippingAbortRef.current?.abort();
+      const ctrl = new AbortController();
+      shippingAbortRef.current = ctrl;
+      setShippingLoading(true);
+      try {
+        const res = await fetch("/api/shipping/estimate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ addressId, itemCount: totalItemCount }),
+          signal: ctrl.signal,
+        });
+        if (!res.ok) { setShippingCostCents(0); return; }
+        const data = await res.json() as { shippingCostCents: number };
+        setShippingCostCents(data.shippingCostCents);
+      } catch {
+        setShippingCostCents(0);
+      } finally {
+        setShippingLoading(false);
+      }
+    },
+    [totalItemCount]
+  );
+
+  useEffect(() => {
+    if (shippingAddressId) fetchShippingEstimate(shippingAddressId);
+  }, [shippingAddressId, fetchShippingEstimate]);
+
   const [creating, setCreating] = useState(false);
   const [paying, setPaying] = useState(false);
   const [simPaying, setSimPaying] = useState(false);
@@ -253,8 +290,8 @@ export default function CheckoutClient({
     : 0;
 
   const totalCents = useMemo(
-    () => Math.max(0, subTotalCents - promoDiscountCents - loyaltyDiscountCents),
-    [subTotalCents, promoDiscountCents, loyaltyDiscountCents]
+    () => Math.max(0, subTotalCents - promoDiscountCents - loyaltyDiscountCents) + (shippingCostCents ?? 0),
+    [subTotalCents, promoDiscountCents, loyaltyDiscountCents, shippingCostCents]
   );
 
   const applyPromo = async () => {
@@ -379,7 +416,7 @@ export default function CheckoutClient({
     if (!res?.ok) { setError("Paiement simulé impossible."); return; }
 
     setPaymentStatus("paid");
-    router.push(`/account/orders/${createdOrder.orderId}`);
+    router.push(`/compte/commandes/${createdOrder.orderId}`);
     router.refresh();
   };
 
@@ -767,7 +804,15 @@ export default function CheckoutClient({
           )}
           <div className="flex items-center justify-between">
             <span>Livraison</span>
-            <span>Offerte</span>
+            <span>
+              {shippingLoading
+                ? "Calcul..."
+                : shippingCostCents === null
+                ? "—"
+                : shippingCostCents === 0
+                ? "Offerte"
+                : `${eurFromCents(shippingCostCents)} €`}
+            </span>
           </div>
         </div>
         <div className="my-4 h-px w-full bg-neutral-200" />

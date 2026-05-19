@@ -47,6 +47,60 @@ function getShippoClient() {
   return new Shippo({ apiKeyHeader: key });
 }
 
+export type ShippingEstimate = {
+  shippingCostCents: number;
+  carrierName: string;
+};
+
+export async function estimateShippingCost(params: {
+  addressId: number;
+  userId: number;
+  itemCount: number;
+}): Promise<ShippingEstimate> {
+  const { addressId, userId, itemCount } = params;
+
+  if (isMockMode()) {
+    return { shippingCostCents: 499, carrierName: "Colissimo (simulation)" };
+  }
+
+  const address = await prisma.address.findFirst({ where: { id: addressId, userId } });
+  if (!address) throw new Error("Adresse introuvable.");
+
+  const client = getShippoClient();
+  const parcel = { ...DEFAULT_PARCEL, weight: String(itemCount * 500) };
+
+  const shipment = await client.shipments.create({
+    addressFrom: FROM_ADDRESS,
+    addressTo: {
+      name: address.name,
+      street1: address.street,
+      city: address.city,
+      zip: address.zipcode,
+      country: toIsoCountry(address.country),
+    },
+    parcels: [parcel],
+    async: false,
+  });
+
+  if (!shipment.rates || shipment.rates.length === 0) {
+    return { shippingCostCents: 0, carrierName: "" };
+  }
+
+  const PREFERRED = ["DHL", "FedEx", "UPS", "Colissimo", "USPS", "TNT", "GLS", "DPD"];
+  const sorted = [...shipment.rates].sort((a, b) => {
+    const aP = PREFERRED.some((p) => a.provider.toUpperCase().includes(p)) ? 0 : 1;
+    const bP = PREFERRED.some((p) => b.provider.toUpperCase().includes(p)) ? 0 : 1;
+    if (aP !== bP) return aP - bP;
+    return parseFloat(a.amount) - parseFloat(b.amount);
+  });
+
+  const best = sorted[0];
+  return {
+    shippingCostCents: Math.round(parseFloat(best.amount) * 100),
+    carrierName: best.provider,
+  };
+}
+
 export type LabelResult = {
   trackingNumber: string;
   labelUrl: string;

@@ -2,13 +2,14 @@ import { redirect } from "next/navigation";
 import { getSessionUser } from "@/lib/auth";
 import { getProductStats } from "@/lib/admin";
 import { eurFromCents } from "@/lib/money";
+import BackButton from "@/components/admin/BackButton";
 
 export const dynamic = "force-dynamic";
 
 export default async function StatsPage() {
   const user = await getSessionUser();
-  if (!user) redirect("/login?next=/admin/stats");
-  if (user.role !== "admin" && user.role !== "superadmin") redirect("/account");
+  if (!user) redirect("/connexion?next=/admin/stats");
+  if (user.role !== "admin" && user.role !== "superadmin") redirect("/compte");
 
   const stats = await getProductStats();
 
@@ -16,7 +17,8 @@ export default async function StatsPage() {
     <main className="min-h-screen bg-neutral-50 px-4 py-12 sm:px-6 lg:px-12">
       <div className="mx-auto max-w-7xl space-y-8">
         <div>
-          <h1 className="font-title text-4xl text-black">Statistiques produits</h1>
+          <BackButton />
+          <h1 className="mt-4 font-title text-4xl text-black">Statistiques produits</h1>
           <p className="mt-1 text-sm text-neutral-500">Ventes et taux de retour par article</p>
         </div>
 

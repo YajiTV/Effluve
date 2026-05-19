@@ -55,14 +55,26 @@ export async function POST(req: Request) {
             : {}),
         },
       },
-      line_items: order.items.map((item) => ({
-        quantity: item.quantity,
-        price_data: {
-          currency: "eur",
-          unit_amount: item.unitPriceCents,
-          product_data: { name: item.productName },
-        },
-      })),
+      line_items: [
+        ...order.items.map((item) => ({
+          quantity: item.quantity,
+          price_data: {
+            currency: "eur",
+            unit_amount: item.unitPriceCents,
+            product_data: { name: item.productName },
+          },
+        })),
+        ...(order.shippingCostCents > 0
+          ? [{
+              quantity: 1,
+              price_data: {
+                currency: "eur",
+                unit_amount: order.shippingCostCents,
+                product_data: { name: "Frais de livraison" },
+              },
+            }]
+          : []),
+      ],
       metadata: {
         orderId: String(order.id),
         userId: String(user.id),

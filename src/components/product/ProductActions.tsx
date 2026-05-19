@@ -53,7 +53,7 @@ export default function ProductActions({
 
     // Si le produit a des tailles, on redirige vers la page produit pour choisir
     if (hasSizes) {
-      router.push(linkTo ?? `/products/${productId}`);
+      router.push(linkTo ?? `/produits/${productId}`);
       return;
     }
 
@@ -71,7 +71,7 @@ export default function ProductActions({
           message: "Connecte-toi pour ajouter au panier.",
           variant: "danger",
         });
-        router.push("/login?next=/men");
+        router.push("/connexion?next=/homme");
         return;
       }
 
@@ -108,7 +108,7 @@ export default function ProductActions({
           message: "Connecte-toi pour gérer tes favoris.",
           variant: "danger",
         });
-        router.push("/login?next=/men");
+        router.push("/connexion?next=/homme");
         return;
       }
 

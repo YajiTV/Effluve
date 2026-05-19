@@ -25,7 +25,7 @@ export default function ProductDetail({ product }: { product: Product }) {
   const [wished, setWished] = useState<boolean | null>(null);
   const [toast, setToast] = useState<ToastState>(null);
 
-  const backHref = product.category === "homme" ? "/men" : product.category === "femme" ? "/women" : "/collection";
+  const backHref = product.category === "homme" ? "/homme" : product.category === "femme" ? "/femme" : "/collection";
 
   const addToCart = async () => {
     if (!product.stock) return;
@@ -43,7 +43,7 @@ export default function ProductDetail({ product }: { product: Product }) {
       });
 
       if (res.status === 401) {
-        router.push(`/login?next=/products/${product.id}`);
+        router.push(`/connexion?next=/produits/${product.id}`);
         return;
       }
 
@@ -72,7 +72,7 @@ export default function ProductDetail({ product }: { product: Product }) {
       });
 
       if (res.status === 401) {
-        router.push(`/login?next=/products/${product.id}`);
+        router.push(`/connexion?next=/produits/${product.id}`);
         return;
       }
 
@@ -216,7 +216,7 @@ export default function ProductDetail({ product }: { product: Product }) {
 
             {/* Size guide link */}
             <Link
-              href="/size-guide"
+              href="/guide-des-tailles"
               className="font-body text-xs underline underline-offset-2 text-effluve-nero/60 hover:text-effluve-nero transition-colors w-fit"
             >
               Guide des tailles

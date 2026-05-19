@@ -65,13 +65,13 @@ export default function NotFound() {
                     </p>
                     <div className="flex flex-wrap justify-center gap-6">
                         <Link
-                            href="/women"
+                            href="/femme"
                             className="font-body text-sm text-effluve-nero hover:text-effluve-black transition-colors"
                         >
                             Femme
                         </Link>
                         <Link
-                            href="/men"
+                            href="/homme"
                             className="font-body text-sm text-effluve-nero hover:text-effluve-black transition-colors"
                         >
                             Homme
@@ -83,13 +83,13 @@ export default function NotFound() {
                             Collection
                         </Link>
                         <Link
-                            href="/account"
+                            href="/compte"
                             className="font-body text-sm text-effluve-nero hover:text-effluve-black transition-colors"
                         >
                             Mon compte
                         </Link>
                         <Link
-                            href="/cart"
+                            href="/panier"
                             className="font-body text-sm text-effluve-nero hover:text-effluve-black transition-colors"
                         >
                             Panier

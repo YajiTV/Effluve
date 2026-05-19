@@ -1,0 +1,270 @@
+.hero {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  min-height: 640px;
+  background: #D5C9B5;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+}
+
+.panelLeft {
+  position: relative;
+  overflow: hidden;
+  background: #1a1612;
+}
+
+.imgLeft {
+  object-fit: cover;
+  object-position: center top !important;
+  opacity: 0;
+  animation: fadeIn 1.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.3s forwards;
+  filter: contrast(1.05) brightness(0.92);
+}
+
+.panelLeft::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to right, rgba(10, 8, 6, 0.15) 0%, transparent 40%),
+    linear-gradient(to top, rgba(10, 8, 6, 0.4) 0%, transparent 50%),
+    linear-gradient(to right, transparent 65%, rgba(10, 8, 6, 0.6) 100%);
+  z-index: 2;
+}
+
+.panelRight {
+  position: relative;
+  overflow: hidden;
+  background: #cfc6b5;
+}
+
+.imgRight {
+  object-fit: cover;
+  object-position: center top !important;
+  opacity: 0;
+  animation: fadeIn 1.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.6s forwards;
+}
+
+.panelRight::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to left, rgba(200, 190, 172, 0.1) 0%, transparent 40%),
+    linear-gradient(to top, rgba(100, 85, 65, 0.25) 0%, transparent 50%),
+    linear-gradient(to left, transparent 65%, rgba(100, 85, 65, 0.45) 100%);
+  z-index: 2;
+}
+
+.centerBrand {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+  width: 220px;
+  height: 100%;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  pointer-events: none;
+}
+
+.lineTop {
+  width: 1px;
+  flex: 1;
+  background: linear-gradient(to bottom, transparent 0%, rgba(212, 198, 175, 0.6) 40%, rgba(212, 198, 175, 0.8) 100%);
+  animation: growLine 1.2s ease 0.9s both;
+  transform-origin: top;
+}
+
+.lineBottom {
+  width: 1px;
+  flex: 1;
+  background: linear-gradient(to bottom, rgba(212, 198, 175, 0.8) 0%, rgba(212, 198, 175, 0.4) 60%, transparent 100%);
+  animation: growLine 1.2s ease 0.9s both;
+  transform-origin: top;
+}
+
+.logoCenter {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 28px 0;
+  opacity: 0;
+  animation: fadeInUp 1s ease 1.1s forwards;
+}
+
+.logoImg {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  opacity: 0.92;
+  filter: brightness(0) invert(1);
+}
+
+.brandName {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 26px;
+  font-weight: 300;
+  letter-spacing: 0.28em;
+  color: #E8E0D2;
+  text-transform: uppercase;
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+  white-space: nowrap;
+}
+
+.tagline {
+  font-family: "Source Sans 3", sans-serif;
+  font-size: 8.5px;
+  font-weight: 300;
+  letter-spacing: 0.32em;
+  color: rgba(232, 222, 205, 0.75);
+  text-transform: uppercase;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.4);
+}
+
+.tricolor {
+  display: flex;
+  gap: 3px;
+  margin-top: 4px;
+}
+
+.tricolor span {
+  width: 18px;
+  height: 2px;
+  display: block;
+}
+
+.topBar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 30;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+  opacity: 0;
+  animation: fadeIn 1s ease 1.8s forwards;
+}
+
+.navItem {
+  font-family: "Source Sans 3", sans-serif;
+  font-size: 8px;
+  letter-spacing: 0.38em;
+  text-transform: uppercase;
+  color: rgba(225, 215, 198, 0.55);
+  font-weight: 300;
+}
+
+.bottomBar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 30;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 48px;
+  background: linear-gradient(to top, rgba(15, 12, 9, 0.65) 0%, transparent 100%);
+  opacity: 0;
+  animation: fadeIn 1s ease 1.6s forwards;
+}
+
+.label {
+  font-family: "Source Sans 3", sans-serif;
+  font-size: 9px;
+  font-weight: 300;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: rgba(220, 210, 192, 0.65);
+}
+
+.collection {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 12px;
+  font-weight: 300;
+  letter-spacing: 0.25em;
+  color: rgba(220, 210, 192, 0.55);
+  text-transform: uppercase;
+}
+
+.corner {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  z-index: 25;
+  opacity: 0;
+  animation: fadeIn 1.2s ease 2s forwards;
+}
+
+.cornerTl {
+  top: 18px;
+  left: 18px;
+  border-top: 1px solid #A8923C;
+  border-left: 1px solid #A8923C;
+  opacity: 0;
+  animation: fadeIn 1.2s ease 2s forwards;
+}
+
+.cornerTr {
+  top: 18px;
+  right: 18px;
+  border-top: 1px solid #A8923C;
+  border-right: 1px solid #A8923C;
+  opacity: 0;
+  animation: fadeIn 1.2s ease 2s forwards;
+}
+
+.cornerBl {
+  bottom: 18px;
+  left: 18px;
+  border-bottom: 1px solid #A8923C;
+  border-left: 1px solid #A8923C;
+  opacity: 0;
+  animation: fadeIn 1.2s ease 2s forwards;
+}
+
+.cornerBr {
+  bottom: 18px;
+  right: 18px;
+  border-bottom: 1px solid #A8923C;
+  border-right: 1px solid #A8923C;
+  opacity: 0;
+  animation: fadeIn 1.2s ease 2s forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes growLine {
+  from { transform: scaleY(0); }
+  to { transform: scaleY(1); }
+}

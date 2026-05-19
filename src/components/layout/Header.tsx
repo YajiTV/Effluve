@@ -43,7 +43,7 @@ export default function Header() {
           {/* Gauche (desktop nav) */}
           <nav className="hidden lg:flex items-center gap-10 flex-1">
             <Link
-              href="/women"
+              href="/femme"
               className="group relative font-body text-xs uppercase tracking-[0.15em] text-effluve-black transition-all duration-300 hover:text-effluve-vanilla"
             >
               Femme
@@ -51,7 +51,7 @@ export default function Header() {
             </Link>
 
             <Link
-              href="/men"
+              href="/homme"
               className="group relative font-body text-xs uppercase tracking-[0.15em] text-effluve-black transition-all duration-300 hover:text-effluve-vanilla"
             >
               Homme
@@ -98,7 +98,7 @@ export default function Header() {
 
             {/* Compte desktop */}
             <Link
-              href="/account"
+              href="/compte"
               className="hidden lg:block p-2 hover:bg-effluve-vanilla/20 rounded-full transition-all duration-300"
               aria-label="Mon compte"
             >
@@ -107,7 +107,7 @@ export default function Header() {
 
             {/* Panier */}
             <Link
-              href="/cart"
+              href="/panier"
               className="relative p-2 hover:bg-effluve-vanilla/20 rounded-full transition-all duration-300"
               aria-label="Panier"
             >
@@ -147,14 +147,14 @@ export default function Header() {
           <div className="lg:hidden py-8 border-t border-gray-200 animate-fadeIn">
             <nav className="flex flex-col gap-6">
               <Link
-                href="/women"
+                href="/femme"
                 className="font-body text-sm uppercase tracking-[0.15em] text-effluve-black hover:text-effluve-vanilla transition-colors py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Femme
               </Link>
               <Link
-                href="/men"
+                href="/homme"
                 className="font-body text-sm uppercase tracking-[0.15em] text-effluve-black hover:text-effluve-vanilla transition-colors py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
@@ -170,7 +170,7 @@ export default function Header() {
 
               <div className="pt-6 border-t border-gray-200 flex flex-col gap-4">
                 <Link
-                  href="/account"
+                  href="/compte"
                   className="font-body text-sm text-effluve-nero hover:text-effluve-vanilla transition-colors"
                   onClick={() => setMobileMenuOpen(false)}
                 >

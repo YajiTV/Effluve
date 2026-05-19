@@ -162,7 +162,7 @@ function buildOrderConfirmationHtml(p: OrderConfirmationParams): string {
               <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td align="center">
-                    <a href="${siteUrl}/account/orders" style="display:inline-block;background:#1a1a1a;color:#F5F0E8;text-decoration:none;font-size:12px;letter-spacing:3px;text-transform:uppercase;padding:14px 32px;border-radius:2px;">
+                    <a href="${siteUrl}/compte/commandes" style="display:inline-block;background:#1a1a1a;color:#F5F0E8;text-decoration:none;font-size:12px;letter-spacing:3px;text-transform:uppercase;padding:14px 32px;border-radius:2px;">
                       Suivre ma commande
                     </a>
                   </td>

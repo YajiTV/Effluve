@@ -2,27 +2,27 @@ import Link from "next/link";
 import NewsletterForm from "./NewsletterForm";
 
 const COLLECTION_LINKS = [
-  { label: "Femme", href: "/women" },
-  { label: "Homme", href: "/men" },
+  { label: "Femme", href: "/femme" },
+  { label: "Homme", href: "/homme" },
   { label: "Collection", href: "/collection" },
-  { label: "Nouveautés", href: "/new-arrivals" },
+  { label: "Nouveautés", href: "/nouveautes" },
   { label: "Promotions", href: "/promotions" },
 ];
 
 const SERVICE_LINKS = [
-  { label: "Livraison", href: "/shipping" },
-  { label: "Retours", href: "/returns" },
-  { label: "Guide des tailles", href: "/size-guide" },
+  { label: "Livraison", href: "/livraison" },
+  { label: "Retours", href: "/retours" },
+  { label: "Guide des tailles", href: "/guide-des-tailles" },
   { label: "FAQ", href: "/faq" },
   { label: "Contact", href: "/contact" },
 ];
 
 const MAISON_LINKS = [
-  { label: "Notre histoire", href: "/our-story" },
-  { label: "Nos valeurs", href: "/our-values" },
-  { label: "Fabrication", href: "/manufacturing" },
-  { label: "Engagement", href: "/commitment" },
-  { label: "Recrutement", href: "/careers" },
+  { label: "Notre histoire", href: "/notre-histoire" },
+  { label: "Nos valeurs", href: "/nos-valeurs" },
+  { label: "Fabrication", href: "/fabrication" },
+  { label: "Engagement", href: "/engagement" },
+  { label: "Recrutement", href: "/recrutement" },
 ];
 
 export default function Footer() {
@@ -49,13 +49,13 @@ export default function Footer() {
 
           {/* Bottom legal */}
           <div className="mt-10 flex items-center justify-end gap-6 border-t border-[#212121] pt-4 text-xs text-[#989898]">
-            <Link href="/legal-notice" className="transition hover:text-[#e8e8e8]">
+            <Link href="/mentions-legales" className="transition hover:text-[#e8e8e8]">
               Mentions légales
             </Link>
-            <Link href="/privacy-policy" className="transition hover:text-[#e8e8e8]">
+            <Link href="/politique-de-confidentialite" className="transition hover:text-[#e8e8e8]">
               Politique de confidentialité
             </Link>
-            <Link href="/terms" className="transition hover:text-[#e8e8e8]">
+            <Link href="/cgv" className="transition hover:text-[#e8e8e8]">
               CGV
             </Link>
           </div>

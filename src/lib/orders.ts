@@ -61,8 +61,9 @@ export async function createOrderFromCart(params: {
   promoCode?: string;
   discountCents?: number;
   useLoyaltyPalier?: boolean;
+  shippingCostCents?: number;
 }) {
-  const { userId, shippingAddressId, billingAddressId, promoCode, discountCents: rawDiscount, useLoyaltyPalier } = params;
+  const { userId, shippingAddressId, billingAddressId, promoCode, discountCents: rawDiscount, useLoyaltyPalier, shippingCostCents: rawShipping } = params;
   const orderNumber = makeOrderNumber(userId);
 
   return prisma.$transaction(async (tx) => {
@@ -110,7 +111,8 @@ export async function createOrderFromCart(params: {
 
     const promoDicount = Math.max(0, Math.min(rawDiscount ?? 0, subTotalCents));
     const discountCents = Math.min(promoDicount + loyaltyDiscountCents, subTotalCents);
-    const totalCents = subTotalCents - discountCents;
+    const shippingCostCents = Math.max(0, rawShipping ?? 0);
+    const totalCents = subTotalCents - discountCents + shippingCostCents;
 
     const order = await tx.order.create({
       data: {
@@ -120,6 +122,7 @@ export async function createOrderFromCart(params: {
         paymentStatus: "pending_payment",
         shippingAddressId,
         billingAddressId,
+        shippingCostCents,
         ...(promoCode ? { promoCode } : {}),
         ...(discountCents > 0 ? { discountCents } : {}),
       },
@@ -146,7 +149,7 @@ export async function createOrderFromCart(params: {
 
     await tx.cartItem.deleteMany({ where: { userId } });
 
-    return { orderId: order.id, orderNumber: order.orderNumber, totalCents, paymentStatus: "pending_payment" as const };
+    return { orderId: order.id, orderNumber: order.orderNumber, totalCents, shippingCostCents, paymentStatus: "pending_payment" as const };
   });
 }
 

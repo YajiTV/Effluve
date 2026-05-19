@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth";
 import { createOrderFromCart } from "@/lib/orders";
 import { validatePromoCode } from "@/lib/promo";
+import { estimateShippingCost } from "@/lib/shippo";
 
 export async function POST(req: Request) {
   const user = await getSessionUser();
@@ -39,6 +40,15 @@ export async function POST(req: Request) {
     }
   }
 
+  // Calcul côté serveur pour que le client ne puisse pas falsifier le montant
+  const { prisma } = await import("@/lib/prisma");
+  const itemCount = await prisma.cartItem.count({ where: { userId: user.id } });
+  const { shippingCostCents } = await estimateShippingCost({
+    addressId: shippingAddressId,
+    userId: user.id,
+    itemCount: Math.max(itemCount, 1),
+  }).catch(() => ({ shippingCostCents: 0 }));
+
   try {
     const order = await createOrderFromCart({
       userId: user.id,
@@ -47,6 +57,7 @@ export async function POST(req: Request) {
       promoCode: validatedPromoCode,
       discountCents,
       useLoyaltyPalier: body?.useLoyalty === true,
+      shippingCostCents,
     });
 
     if (validatedPromoCode) {

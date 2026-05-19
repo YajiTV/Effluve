@@ -27,13 +27,13 @@ export default async function CollectionPage() {
 
           <div className="mt-6 flex flex-wrap gap-3">
             <Link
-              href="/women"
+              href="/femme"
               className="inline-flex h-11 items-center justify-center rounded-xl border border-neutral-300 bg-white px-5 text-sm font-semibold text-neutral-900 hover:border-neutral-400 transition"
             >
               Voir Femme
             </Link>
             <Link
-              href="/men"
+              href="/homme"
               className="inline-flex h-11 items-center justify-center rounded-xl border border-neutral-300 bg-white px-5 text-sm font-semibold text-neutral-900 hover:border-neutral-400 transition"
             >
               Voir Homme

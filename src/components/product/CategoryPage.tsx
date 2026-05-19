@@ -53,14 +53,14 @@ export default async function CategoryPage({
             </Link>
 
             <Link
-              href="/cart"
+              href="/panier"
               className="inline-flex h-11 items-center justify-center rounded-xl border border-neutral-300 bg-white px-5 text-sm font-semibold text-neutral-900 hover:border-neutral-400 transition"
             >
               Mon panier
             </Link>
 
             <Link
-              href="/account/wishlist"
+              href="/compte/liste-de-souhaits"
               className="inline-flex h-11 items-center justify-center rounded-xl border border-neutral-300 bg-white px-5 text-sm font-semibold text-neutral-900 hover:border-neutral-400 transition"
             >
               Mes favoris

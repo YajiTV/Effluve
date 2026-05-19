@@ -38,18 +38,18 @@ export async function proxy(req: NextRequest) {
   const sessionValid = sessionToken ? await verifySession(sessionToken) : false;
   const resetValid = resetToken ? await verifyReset(resetToken) : false;
 
-  if (pathname === "/reset-password") {
+  if (pathname === "/reinitialisation") {
     if (sessionValid) {
-      return NextResponse.redirect(new URL("/account", req.url));
+      return NextResponse.redirect(new URL("/compte", req.url));
     }
     if (!resetValid) {
-      return NextResponse.redirect(new URL("/login?error=reset_expired", req.url));
+      return NextResponse.redirect(new URL("/connexion?error=reset_expired", req.url));
     }
     return NextResponse.next();
   }
 
   const isProtected =
-    pathname.startsWith("/account") ||
+    pathname.startsWith("/compte") ||
     pathname.startsWith("/admin") ||
     pathname.startsWith("/api/cart") ||
     pathname.startsWith("/api/checkout") ||
@@ -58,15 +58,15 @@ export async function proxy(req: NextRequest) {
     pathname.startsWith("/api/payment");
 
   if (isProtected && resetValid) {
-    return NextResponse.redirect(new URL("/reset-password", req.url));
+    return NextResponse.redirect(new URL("/reinitialisation", req.url));
   }
 
   if (pathname.startsWith("/admin") && !sessionValid) {
-    return NextResponse.redirect(new URL(`/login?next=${encodeURIComponent(pathname)}`, req.url));
+    return NextResponse.redirect(new URL(`/connexion?next=${encodeURIComponent(pathname)}`, req.url));
   }
 
-  if (pathname.startsWith("/account") && !sessionValid) {
-    return NextResponse.redirect(new URL(`/login?next=${encodeURIComponent(pathname)}`, req.url));
+  if (pathname.startsWith("/compte") && !sessionValid) {
+    return NextResponse.redirect(new URL(`/connexion?next=${encodeURIComponent(pathname)}`, req.url));
   }
 
   return NextResponse.next();

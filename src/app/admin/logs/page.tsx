@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getSessionUser } from "@/lib/auth";
 import { getAdminLogs } from "@/lib/admin-log";
+import BackButton from "@/components/admin/BackButton";
 
 export const dynamic = "force-dynamic";
 
@@ -19,8 +20,8 @@ const ACTION_LABELS: Record<string, string> = {
 
 export default async function LogsPage() {
   const user = await getSessionUser();
-  if (!user) redirect("/login?next=/admin/logs");
-  if (user.role !== "admin" && user.role !== "superadmin") redirect("/account");
+  if (!user) redirect("/connexion?next=/admin/logs");
+  if (user.role !== "admin" && user.role !== "superadmin") redirect("/compte");
 
   const logs = await getAdminLogs(200);
 
@@ -28,7 +29,8 @@ export default async function LogsPage() {
     <main className="min-h-screen bg-neutral-50 px-4 py-12 sm:px-6 lg:px-12">
       <div className="mx-auto max-w-7xl space-y-8">
         <div>
-          <h1 className="font-title text-4xl text-black">Logs d'activité</h1>
+          <BackButton />
+          <h1 className="mt-4 font-title text-4xl text-black">Logs d'activité</h1>
           <p className="mt-1 text-sm text-neutral-500">Actions effectuées par les administrateurs</p>
         </div>
 
