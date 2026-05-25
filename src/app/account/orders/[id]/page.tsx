@@ -30,7 +30,7 @@ function buildTimeline(status: OrderStatus): TimelineStep[] {
 
 export default async function OrderDetailPage({ params }: Params) {
   const user = await getSessionUser();
-  if (!user) redirect("/connexion?next=/compte/commandes");
+  if (!user) redirect("/login?next=/account/orders");
 
   const { id } = await params;
   const orderId = Number(id);
@@ -54,7 +54,7 @@ export default async function OrderDetailPage({ params }: Params) {
             </p>
           </div>
           <Link
-            href="/compte/commandes"
+            href="/account/orders"
             className="text-sm font-semibold text-neutral-900 underline underline-offset-4"
           >
             ← Mes commandes
@@ -173,7 +173,7 @@ export default async function OrderDetailPage({ params }: Params) {
               </a>
             )}
             <Link
-              href="/compte/retours"
+              href="/account/returns"
               className="inline-flex h-10 items-center rounded-xl border border-neutral-200 bg-white px-5 text-sm font-semibold text-neutral-700 hover:border-neutral-400 transition-colors"
             >
               Demander un retour

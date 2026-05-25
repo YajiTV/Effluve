@@ -6,27 +6,48 @@ export default function LivraisonPage() {
 
         <div className="space-y-8 font-body text-effluve-nero">
           <section>
-            <h2 className="text-xl font-semibold mb-3">Délais de livraison</h2>
-            <ul className="space-y-2 text-sm leading-relaxed">
-              <li><span className="font-medium">Standard (3–5 jours ouvrés)</span> — offerte dès 150 €</li>
-              <li><span className="font-medium">Express (24–48 h)</span> — 9,90 €</li>
-              <li><span className="font-medium">International (5–10 jours ouvrés)</span> — à partir de 14,90 €</li>
+            <h2 className="text-xl font-semibold mb-3">Frais de livraison</h2>
+            <p className="text-sm leading-relaxed">
+              Les frais de livraison sont calculés automatiquement lors de la commande en fonction de votre adresse de livraison et du poids total de votre colis.
+              Le montant exact vous est indiqué avant de confirmer votre paiement.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-semibold mb-3">Transporteurs</h2>
+            <p className="text-sm leading-relaxed mb-2">
+              Nous travaillons avec les transporteurs suivants, sélectionnés automatiquement selon la meilleure offre disponible pour votre destination :
+            </p>
+            <ul className="space-y-1 text-sm leading-relaxed list-disc list-inside">
+              <li>Colissimo</li>
+              <li>DHL</li>
+              <li>GLS</li>
+              <li>DPD</li>
+              <li>UPS</li>
+              <li>FedEx</li>
+              <li>TNT</li>
             </ul>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-semibold mb-3">Zones de livraison</h2>
+            <p className="text-sm leading-relaxed mb-2">Nous livrons dans les pays suivants :</p>
+            <ul className="space-y-1 text-sm leading-relaxed list-disc list-inside">
+              <li>France métropolitaine</li>
+              <li>Belgique, Luxembourg, Suisse</li>
+              <li>Espagne, Italie, Allemagne</li>
+              <li>Royaume-Uni, États-Unis</li>
+            </ul>
+            <p className="text-sm leading-relaxed mt-3">
+              Pour toute destination non listée, contactez notre service client.
+            </p>
           </section>
 
           <section>
             <h2 className="text-xl font-semibold mb-3">Suivi de commande</h2>
             <p className="text-sm leading-relaxed">
-              Un email de confirmation contenant votre numéro de suivi vous est envoyé dès l&apos;expédition.
-              Vous pouvez suivre votre colis depuis votre espace compte.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-xl font-semibold mb-3">Zone de livraison</h2>
-            <p className="text-sm leading-relaxed">
-              Nous livrons en France métropolitaine, en Europe et dans une sélection de pays à l&apos;international.
-              Pour toute demande spécifique, contactez notre service client.
+              Un email contenant votre numéro de suivi vous est envoyé dès l&apos;expédition.
+              Vous pouvez également consulter le statut de votre commande depuis votre espace compte.
             </p>
           </section>
         </div>

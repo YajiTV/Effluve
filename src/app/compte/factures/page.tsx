@@ -40,19 +40,17 @@ export default async function InvoicesPage() {
             <table className="w-full border-collapse text-left">
               <thead className="bg-neutral-50 text-xs uppercase tracking-[0.16em] text-neutral-500">
                 <tr>
-                  <th className="px-4 py-3">N° Facture</th>
                   <th className="px-4 py-3">Commande</th>
                   <th className="px-4 py-3">Date</th>
                   <th className="px-4 py-3">Montant TTC</th>
                   <th className="px-4 py-3">Statut</th>
-                  <th className="px-4 py-3">Action</th>
+                  <th className="px-4 py-3">Facture PDF</th>
                 </tr>
               </thead>
               <tbody>
                 {invoices.map((order) => (
                   <tr key={order.id} className="border-t border-neutral-200 text-sm text-neutral-800">
-                    <td className="px-4 py-3 font-semibold">FAC-{order.orderNumber}</td>
-                    <td className="px-4 py-3 text-neutral-500">{order.orderNumber}</td>
+                    <td className="px-4 py-3 font-semibold">{order.orderNumber}</td>
                     <td className="px-4 py-3">
                       {new Date(order.createdAt).toLocaleDateString("fr-FR")}
                     </td>
@@ -63,12 +61,18 @@ export default async function InvoicesPage() {
                       </span>
                     </td>
                     <td className="px-4 py-3">
-                      <Link
-                        href={`/compte/commandes/${order.id}/invoice`}
-                        className="font-semibold text-indigo-600 underline underline-offset-4 hover:text-indigo-800"
-                      >
-                        Voir la facture
-                      </Link>
+                      {order.stripeInvoiceUrl ? (
+                        <a
+                          href={order.stripeInvoiceUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="font-semibold text-indigo-600 underline underline-offset-4 hover:text-indigo-800"
+                        >
+                          Télécharger PDF
+                        </a>
+                      ) : (
+                        <span className="text-neutral-400 text-xs">Non disponible</span>
+                      )}
                     </td>
                   </tr>
                 ))}
