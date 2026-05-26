@@ -6,7 +6,22 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/admin/", "/compte/", "/api/", "/commande/", "/panier"],
+        disallow: [
+          "/admin/",
+          "/compte/",
+          "/api/",
+          "/commande/",
+          "/panier",
+          // Routes anglaises doublons (évite le duplicate content)
+          "/account/",
+          "/cart/",
+          "/checkout/",
+          "/products/",
+          // Pages auth (aucune valeur SEO)
+          "/connexion/",
+          "/inscription/",
+          "/reinitialisation/",
+        ],
       },
     ],
     sitemap: "https://effluve.fr/sitemap.xml",
