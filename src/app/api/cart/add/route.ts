@@ -17,18 +17,28 @@ export async function POST(req: Request) {
     const user = await getSessionUser();
     if (!user) return NextResponse.json({ error: "UNAUTHENTICATED" }, { status: 401 });
 
-    const body = (await req.json().catch(() => null)) as { productId?: number } | null;
+    const body = (await req.json().catch(() => null)) as { productId?: number; size?: string } | null;
     const productId = Number(body?.productId);
     if (!productId) return NextResponse.json({ error: "INVALID_PRODUCT" }, { status: 400 });
+    const size = body?.size ? String(body.size).trim().toUpperCase() : "";
 
     const product = await prisma.product.findUnique({ where: { id: productId }, select: { id: true } });
     if (!product) return NextResponse.json({ error: "INVALID_PRODUCT" }, { status: 400 });
 
-    await prisma.cartItem.upsert({
-      where: { userId_productId: { userId: user.id, productId } },
-      create: { userId: user.id, productId, quantity: 1 },
-      update: { quantity: { increment: 1 } },
+    const existing = await prisma.cartItem.findFirst({
+      where: { userId: user.id, productId, size },
     });
+
+    if (existing) {
+      await prisma.cartItem.update({
+        where: { id: existing.id },
+        data: { quantity: { increment: 1 } },
+      });
+    } else {
+      await prisma.cartItem.create({
+        data: { userId: user.id, productId, quantity: 1, size },
+      });
+    }
 
     return NextResponse.json({ ok: true });
   } catch (err: unknown) {

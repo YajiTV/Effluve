@@ -83,13 +83,13 @@ export default function NotFound() {
                             Collection
                         </Link>
                         <Link
-                            href="/account"
+                            href="/compte"
                             className="font-body text-sm text-effluve-nero hover:text-effluve-black transition-colors"
                         >
                             Mon compte
                         </Link>
                         <Link
-                            href="/cart"
+                            href="/panier"
                             className="font-body text-sm text-effluve-nero hover:text-effluve-black transition-colors"
                         >
                             Panier

@@ -1,10 +1,20 @@
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
-import { signSession, sessionCookie } from '@/lib/auth';
+import { signSession, sessionCookie, signResetToken, resetCookie } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { rateLimit, getClientIp } from '@/lib/rate-limit';
 
 export async function POST(req: Request) {
   try {
+    const ip = getClientIp(req);
+    const rl = rateLimit(`login:${ip}`, 5, 15 * 60 * 1000);
+    if (!rl.ok) {
+      return NextResponse.json(
+        { error: 'Trop de tentatives. Réessayez dans 15 minutes.' },
+        { status: 429, headers: { 'Retry-After': String(rl.retryAfter) } }
+      );
+    }
+
     const body: unknown = await req.json().catch(() => null);
     const { email, password } = (body ?? {}) as { email?: string; password?: string };
 
@@ -17,7 +27,7 @@ export async function POST(req: Request) {
 
     const u = await prisma.user.findUnique({
       where: { email: safeEmail },
-      select: { id: true, email: true, passwordHash: true, fullName: true, role: true },
+      select: { id: true, email: true, passwordHash: true, fullName: true, role: true, mustResetPassword: true, tokenVersion: true },
     });
 
     if (!u) {
@@ -29,8 +39,15 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Identifiants invalides' }, { status: 401 });
     }
 
+    if (u.mustResetPassword) {
+      const resetToken = await signResetToken(u.id);
+      const res = NextResponse.json({ mustResetPassword: true });
+      res.cookies.set(resetCookie.name, resetToken, resetCookie.options);
+      return res;
+    }
+
     const user = { id: u.id, email: u.email, full_name: u.fullName, role: u.role };
-    const token = await signSession(user);
+    const token = await signSession(user, u.tokenVersion);
 
     const res = NextResponse.json({ ok: true, user });
     res.cookies.set(sessionCookie.name, token, sessionCookie.options);

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getStripeClient, isStripeConfigured } from "@/lib/stripe";
+import { rateLimit } from "@/lib/rate-limit";
 
 function getBaseUrl(reqUrl: string): string {
   const { origin } = new URL(reqUrl);
@@ -13,6 +14,15 @@ export async function POST(req: Request) {
   try {
     const user = await getSessionUser();
     if (!user) return NextResponse.json({ error: "UNAUTHENTICATED" }, { status: 401 });
+
+    const rl = rateLimit(`payment:${user.id}`, 10, 60 * 1000);
+    if (!rl.ok) {
+      return NextResponse.json(
+        { error: "Trop de tentatives de paiement. Réessayez dans 1 minute." },
+        { status: 429, headers: { "Retry-After": String(rl.retryAfter) } }
+      );
+    }
+
     if (!isStripeConfigured) return NextResponse.json({ error: "STRIPE_NOT_CONFIGURED" }, { status: 503 });
 
     const stripe = getStripeClient();
@@ -55,14 +65,26 @@ export async function POST(req: Request) {
             : {}),
         },
       },
-      line_items: order.items.map((item) => ({
-        quantity: item.quantity,
-        price_data: {
-          currency: "eur",
-          unit_amount: item.unitPriceCents,
-          product_data: { name: item.productName },
-        },
-      })),
+      line_items: [
+        ...order.items.map((item) => ({
+          quantity: item.quantity,
+          price_data: {
+            currency: "eur",
+            unit_amount: item.unitPriceCents,
+            product_data: { name: item.productName },
+          },
+        })),
+        ...(order.shippingCostCents > 0
+          ? [{
+              quantity: 1,
+              price_data: {
+                currency: "eur",
+                unit_amount: order.shippingCostCents,
+                product_data: { name: "Frais de livraison" },
+              },
+            }]
+          : []),
+      ],
       metadata: {
         orderId: String(order.id),
         userId: String(user.id),

@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
+import { computeLoyaltyDiscount, consumeLoyaltyPalier, PALIER } from "@/lib/loyalty";
 
-export type OrderStatus = "pending_payment" | "paid" | "cancelled";
+export type OrderStatus = "pending_payment" | "paid" | "preparing" | "shipped" | "delivered" | "cancelled";
 
 export type OrderSummary = {
   id: number;
@@ -8,6 +9,7 @@ export type OrderSummary = {
   createdAt: string;
   totalCents: number;
   paymentStatus: OrderStatus;
+  stripeInvoiceUrl: string | null;
 };
 
 export type OrderDetail = {
@@ -17,6 +19,8 @@ export type OrderDetail = {
   totalCents: number;
   paymentStatus: OrderStatus;
   stripeInvoiceUrl: string | null;
+  trackingNumber: string | null;
+  carrierName: string | null;
   shippingAddressId: number;
   billingAddressId: number;
   items: {
@@ -38,6 +42,14 @@ export type PaidOrderForReturn = {
   }[];
 };
 
+export type PendingOrder = {
+  id: number;
+  orderNumber: string;
+  totalCents: number;
+  createdAt: string;
+  items: { productName: string; quantity: number; unitPriceCents: number }[];
+};
+
 function makeOrderNumber(userId: number) {
   const stamp = Date.now().toString(36).toUpperCase();
   return `CMD-${userId}-${stamp}`;
@@ -47,19 +59,34 @@ export async function createOrderFromCart(params: {
   userId: number;
   shippingAddressId: number;
   billingAddressId: number;
+  promoCode?: string;
+  discountCents?: number;
+  useLoyaltyPalier?: boolean;
+  shippingCostCents?: number;
 }) {
-  const { userId, shippingAddressId, billingAddressId } = params;
+  const { userId, shippingAddressId, billingAddressId, promoCode, discountCents: rawDiscount, useLoyaltyPalier, shippingCostCents: rawShipping } = params;
   const orderNumber = makeOrderNumber(userId);
 
   return prisma.$transaction(async (tx) => {
     const cartItems = await tx.cartItem.findMany({
       where: { userId },
-      include: { product: true },
+      include: {
+        product: {
+          select: { id: true, name: true, priceCents: true, stock: true },
+        },
+      },
       orderBy: { id: "desc" },
     });
 
     if (!cartItems.length) {
       throw new Error("PANIER_VIDE");
+    }
+
+    // Vérifie que tous les articles ont du stock suffisant
+    const outOfStock = cartItems.filter((item) => item.product.stock < item.quantity);
+    if (outOfStock.length > 0) {
+      const names = outOfStock.map((item) => item.product.name).join(", ");
+      throw new Error(`STOCK_INSUFFISANT:${names}`);
     }
 
     const [shippingAddress, billingAddress] = await Promise.all([
@@ -71,7 +98,22 @@ export async function createOrderFromCart(params: {
       throw new Error("ADRESSE_INVALIDE");
     }
 
-    const totalCents = cartItems.reduce((sum, row) => sum + row.product.priceCents * row.quantity, 0);
+    const subTotalCents = cartItems.reduce((sum, row) => sum + row.product.priceCents * row.quantity, 0);
+
+    // Vérifie que le palier fidélité est bien disponible avant de l'appliquer
+    let loyaltyDiscountCents = 0;
+    if (useLoyaltyPalier) {
+      const user = await tx.user.findUnique({ where: { id: userId }, select: { loyaltyPoints: true } });
+      if ((user?.loyaltyPoints ?? 0) >= PALIER) {
+        loyaltyDiscountCents = computeLoyaltyDiscount(subTotalCents - Math.max(0, Math.min(rawDiscount ?? 0, subTotalCents)));
+        await consumeLoyaltyPalier(userId, tx);
+      }
+    }
+
+    const promoDicount = Math.max(0, Math.min(rawDiscount ?? 0, subTotalCents));
+    const discountCents = Math.min(promoDicount + loyaltyDiscountCents, subTotalCents);
+    const shippingCostCents = Math.max(0, rawShipping ?? 0);
+    const totalCents = subTotalCents - discountCents + shippingCostCents;
 
     const order = await tx.order.create({
       data: {
@@ -81,6 +123,9 @@ export async function createOrderFromCart(params: {
         paymentStatus: "pending_payment",
         shippingAddressId,
         billingAddressId,
+        shippingCostCents,
+        ...(promoCode ? { promoCode } : {}),
+        ...(discountCents > 0 ? { discountCents } : {}),
       },
     });
 
@@ -95,9 +140,17 @@ export async function createOrderFromCart(params: {
       })),
     });
 
+    // Décrémente le stock de chaque produit commandé
+    for (const item of cartItems) {
+      await tx.product.update({
+        where: { id: item.productId },
+        data: { stock: { decrement: item.quantity } },
+      });
+    }
+
     await tx.cartItem.deleteMany({ where: { userId } });
 
-    return { orderId: order.id, orderNumber: order.orderNumber, totalCents, paymentStatus: "pending_payment" as const };
+    return { orderId: order.id, orderNumber: order.orderNumber, totalCents, shippingCostCents, paymentStatus: "pending_payment" as const };
   });
 }
 
@@ -135,6 +188,7 @@ export async function getOrdersByUserId(userId: number): Promise<OrderSummary[]>
       createdAt: true,
       totalCents: true,
       paymentStatus: true,
+      stripeInvoiceUrl: true,
     },
   });
 
@@ -144,6 +198,7 @@ export async function getOrdersByUserId(userId: number): Promise<OrderSummary[]>
     createdAt: row.createdAt.toISOString(),
     totalCents: row.totalCents,
     paymentStatus: row.paymentStatus,
+    stripeInvoiceUrl: row.stripeInvoiceUrl ?? null,
   }));
 }
 
@@ -164,6 +219,8 @@ export async function getOrderDetailById(userId: number, orderId: number): Promi
     totalCents: row.totalCents,
     paymentStatus: row.paymentStatus,
     stripeInvoiceUrl: row.stripeInvoiceUrl ?? null,
+    trackingNumber: row.trackingNumber ?? null,
+    carrierName: row.carrierName ?? null,
     shippingAddressId: row.shippingAddressId,
     billingAddressId: row.billingAddressId,
     items: row.items.map((item) => ({
@@ -234,6 +291,26 @@ export async function getOrderInvoiceData(userId: number, orderId: number): Prom
       lineTotalCents: item.lineTotalCents,
     })),
   };
+}
+
+export async function getPendingOrdersByUserId(userId: number): Promise<PendingOrder[]> {
+  const rows = await prisma.order.findMany({
+    where: { userId, paymentStatus: "pending_payment" },
+    include: { items: { orderBy: { id: "asc" } } },
+    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+  });
+
+  return rows.map((row) => ({
+    id: row.id,
+    orderNumber: row.orderNumber,
+    totalCents: row.totalCents,
+    createdAt: row.createdAt.toISOString(),
+    items: row.items.map((item) => ({
+      productName: item.productName,
+      quantity: item.quantity,
+      unitPriceCents: item.unitPriceCents,
+    })),
+  }));
 }
 
 export async function getPaidOrdersWithItemsByUserId(userId: number): Promise<PaidOrderForReturn[]> {

@@ -1,14 +1,15 @@
 import { redirect } from "next/navigation";
-import AdminReturnsTable from "@/components/AdminReturnsTable";
+import AdminReturnsTable from "@/components/account/AdminReturnsTable";
 import { getSessionUser } from "@/lib/auth";
 import { getAllReturnsForAdmin } from "@/lib/returns";
+import BackButton from "@/components/admin/BackButton";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminReturnsPage() {
   const user = await getSessionUser();
-  if (!user) redirect("/login?next=/admin/returns");
-  if (user.role !== "admin") redirect("/account");
+  if (!user) redirect("/connexion?next=/admin/returns");
+  if (user.role !== "admin" && user.role !== "superadmin") redirect("/compte");
 
   const rows = await getAllReturnsForAdmin();
 
@@ -16,7 +17,8 @@ export default async function AdminReturnsPage() {
     <main className="min-h-screen bg-neutral-50 px-4 py-12 sm:px-6 lg:px-12">
       <div className="mx-auto max-w-7xl space-y-6">
         <div>
-          <h1 className="font-title text-4xl text-black">Dashboard Admin - Retours</h1>
+          <BackButton />
+          <h1 className="mt-4 font-title text-4xl text-black">Dashboard Admin - Retours</h1>
           <p className="mt-2 text-neutral-600">Valide les retours et gère les remboursements.</p>
         </div>
 

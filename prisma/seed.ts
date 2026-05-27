@@ -8,26 +8,26 @@ async function main() {
   const products = [
     // --- HOMME (img1, img2, img3) ---
     {
-      name: "Veste en laine mérinos",
+      name: "Pull en laine",
       description:
-        "Veste structurée en laine mérinos extra-fine. Coupe ajustée, idéale pour les occasions formelles comme casual.",
-      priceCents: 18900,
+          "Pull structuré en laine mérinos extra-fine. Coupe ajustée, idéale pour les occasions formelles comme casual.",
+        priceCents: 44900,
       imageUrl: "/images/img1.png",
       category: ProductCategory.homme,
     },
     {
-      name: "Manteau oversize camel",
+      name: "Veste en cachemire mélangé",
       description:
-        "Grand manteau oversize en cachemire mélangé, couleur camel. Chaleureux et élégant pour l'hiver.",
-      priceCents: 29500,
+        "Veste en cachemire mélangé, couleur noire. Chaleureuse et élégante pour l'hiver.",
+      priceCents: 79500,
       imageUrl: "/images/img2.png",
       category: ProductCategory.homme,
     },
     {
-      name: "Pull col roulé en angora",
+      name: "Veste en laine grise",
       description:
-        "Pull col roulé en mélange angora et laine. Douceur incomparable, disponible en coloris neutres.",
-      priceCents: 12400,
+        "Veste en laine grise, coupe ajustée. Idéale pour un look élégant et discret.",
+      priceCents: 52400,
       imageUrl: "/images/img3.png",
       category: ProductCategory.homme,
     },

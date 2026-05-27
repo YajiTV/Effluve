@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 
+
 const isProd = process.env.NODE_ENV === "production";
 
 const nextConfig: NextConfig = {
@@ -20,6 +21,14 @@ const nextConfig: NextConfig = {
     "http://localhost:3000",
     "http://127.0.0.1:3000",
   ],
+
+  images: {
+    remotePatterns: [
+      { protocol: "https", hostname: "**" },
+      { protocol: "http", hostname: "localhost" },
+      { protocol: "http", hostname: "127.0.0.1" },
+    ],
+  },
 };
 
 export default nextConfig;

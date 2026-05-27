@@ -1,122 +1,187 @@
-// app/page.tsx
+import Image from "next/image";
 import Link from "next/link";
+import HeroBanner from "@/components/layout/HeroBanner";
 
 export const dynamic = "force-dynamic";
 
-function ArrowRight() {
-  return (
-    <svg
-      aria-hidden="true"
-      viewBox="0 0 20 20"
-      fill="currentColor"
-      className="h-4 w-4"
-    >
-      <path
-        fillRule="evenodd"
-        d="M3 10a.75.75 0 0 1 .75-.75h10.69l-3.22-3.22a.75.75 0 1 1 1.06-1.06l4.5 4.5c.3.3.3.77 0 1.06l-4.5 4.5a.75.75 0 1 1-1.06-1.06l3.22-3.22H3.75A.75.75 0 0 1 3 10Z"
-        clipRule="evenodd"
-      />
-    </svg>
-  );
-}
-
 export default function HomePage() {
   return (
-    <main className="relative overflow-hidden bg-white">
-      {/* Fond discret */}
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -top-40 left-1/2 h-[520px] w-[520px] -translate-x-1/2 rounded-full bg-gradient-to-b from-neutral-200/70 to-transparent blur-3xl" />
-        <div className="absolute -bottom-48 right-[-120px] h-[520px] w-[520px] rounded-full bg-gradient-to-b from-neutral-200/50 to-transparent blur-3xl" />
-      </div>
+    <main className="bg-effluve-white">
 
-      <section className="relative mx-auto flex min-h-[72vh] max-w-6xl flex-col items-center justify-center px-4 py-16">
-        {/* Badge */}
-        <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-white/70 px-4 py-2 text-xs text-neutral-700 shadow-sm backdrop-blur">
-          <span className="h-2 w-2 rounded-full bg-neutral-900" />
-          Nouvelle collection • Made in France
-        </div>
+      {/* ── Hero plein écran ── */}
+      <HeroBanner />
 
-        {/* Titre */}
-        <h1 className="text-center font-serif text-5xl tracking-tight text-neutral-900 sm:text-6xl">
-          Effluve
-        </h1>
+      {/* ── Bandeau valeurs ── */}
+      <section className="border-y border-neutral-100 bg-effluve-white">
+        <div className="mx-auto max-w-[1400px] px-8">
+          <div className="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-neutral-100">
 
-        {/* Sous-titre */}
-        <p className="mt-5 max-w-2xl text-center text-base leading-relaxed text-neutral-600 sm:text-lg">
-          L’élégance moderne, minimaliste et durable. Découvrez une collection pensée pour durer,
-          avec des matières sélectionnées et une coupe essentielle.
-        </p>
-        
-        {/* CTA */}
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-          <Link
-            href="/collection"
-            className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-neutral-900 px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-black"
-          >
-            Découvrir la collection <ArrowRight />
-          </Link>
+            {[
+              { tag: "Matières", title: "Coton & laine", desc: "Sélection soignée, confort au quotidien, toucher doux." },
+              { tag: "Fabrication", title: "Made in France", desc: "Production locale, finitions impeccables, exigence totale." },
+              { tag: "Style", title: "Minimal & durable", desc: "Des silhouettes simples qui traversent les saisons." },
+            ].map(({ tag, title, desc }) => (
+              <div key={tag} className="group py-12 px-8 sm:px-12 hover:bg-neutral-50 transition-colors duration-300">
+                <p className="font-body text-[9px] uppercase tracking-[0.4em] text-effluve-vanilla">
+                  {tag}
+                </p>
+                <p className="font-title mt-3 text-2xl text-effluve-black">{title}</p>
+                <p className="font-body mt-2 text-xs text-neutral-400 leading-relaxed">{desc}</p>
+              </div>
+            ))}
 
-          <Link
-            href="/femme"
-            className="inline-flex h-11 items-center justify-center rounded-xl border border-neutral-300 bg-white px-5 text-sm font-semibold text-neutral-900 transition hover:border-neutral-400"
-          >
-            Femme
-          </Link>
-
-          <Link
-            href="/homme"
-            className="inline-flex h-11 items-center justify-center rounded-xl border border-neutral-300 bg-white px-5 text-sm font-semibold text-neutral-900 transition hover:border-neutral-400"
-          >
-            Homme
-          </Link>
-        </div>
-
-        {/* Features */}
-        <div className="mt-12 grid w-full max-w-4xl grid-cols-1 gap-4 sm:grid-cols-3">
-          <div className="rounded-2xl border border-neutral-200 bg-white/70 p-5 shadow-sm backdrop-blur">
-            <p className="text-xs font-semibold tracking-[0.22em] text-neutral-500 uppercase">
-              Matières
-            </p>
-            <p className="mt-2 text-sm font-semibold text-neutral-900">Coton & laine</p>
-            <p className="mt-1 text-sm text-neutral-600">
-              Confort au quotidien, toucher doux, sélection soignée.
-            </p>
           </div>
-
-          <div className="rounded-2xl border border-neutral-200 bg-white/70 p-5 shadow-sm backdrop-blur">
-            <p className="text-xs font-semibold tracking-[0.22em] text-neutral-500 uppercase">
-              Fabrication
-            </p>
-            <p className="mt-2 text-sm font-semibold text-neutral-900">Made in France</p>
-            <p className="mt-1 text-sm text-neutral-600">
-              Production locale, finitions propres, exigence qualité.
-            </p>
-          </div>
-
-          <div className="rounded-2xl border border-neutral-200 bg-white/70 p-5 shadow-sm backdrop-blur">
-            <p className="text-xs font-semibold tracking-[0.22em] text-neutral-500 uppercase">
-              Style
-            </p>
-            <p className="mt-2 text-sm font-semibold text-neutral-900">Minimal & durable</p>
-            <p className="mt-1 text-sm text-neutral-600">
-              Une silhouette simple, des pièces qui traversent le temps.
-            </p>
-          </div>
-        </div>
-
-        {/* Mini navigation bas */}
-        <div className="mt-12 flex items-center gap-6 text-sm text-neutral-600">
-          <Link className="underline underline-offset-4 hover:text-neutral-900" href="/collection">
-            Voir tout
-          </Link>
-          <Link className="underline underline-offset-4 hover:text-neutral-900" href="/register">
-            Créer un compte
-          </Link>
-          <Link className="underline underline-offset-4 hover:text-neutral-900" href="/login">
-            Se connecter
-          </Link>
         </div>
       </section>
+
+      {/* ── Double panneau Femme / Homme ── */}
+      <section className="grid grid-cols-1 md:grid-cols-2 h-[80vh] min-h-[500px]">
+
+        {/* Femme */}
+        <Link href="/femme" className="group relative overflow-hidden">
+          <Image
+            src="/images/img4.png"
+            alt="Collection Femme"
+            fill
+            sizes="50vw"
+            className="object-cover object-top transition-transform duration-700 group-hover:scale-105"
+          />
+          <div className="absolute inset-0 bg-black/30 group-hover:bg-black/20 transition-colors duration-500" />
+          <div className="absolute inset-0 flex flex-col items-center justify-end pb-14 text-center">
+            <p className="font-body text-[9px] uppercase tracking-[0.4em] text-white/60 mb-3">Collection</p>
+            <h2 className="font-title text-5xl sm:text-6xl text-effluve-white tracking-wide">Femme</h2>
+            <div className="mt-5 h-px w-8 bg-effluve-vanilla mx-auto group-hover:w-16 transition-all duration-500" />
+            <p className="font-body mt-4 text-[10px] uppercase tracking-[0.3em] text-white/60 group-hover:text-white/90 transition-colors duration-300">
+              Découvrir →
+            </p>
+          </div>
+        </Link>
+
+        {/* Homme */}
+        <Link href="/homme" className="group relative overflow-hidden">
+          <Image
+            src="/images/img3.png"
+            alt="Collection Homme"
+            fill
+            sizes="50vw"
+            className="object-cover object-top transition-transform duration-700 group-hover:scale-105"
+          />
+          <div className="absolute inset-0 bg-black/35 group-hover:bg-black/25 transition-colors duration-500" />
+          <div className="absolute inset-0 flex flex-col items-center justify-end pb-14 text-center">
+            <p className="font-body text-[9px] uppercase tracking-[0.4em] text-white/60 mb-3">Collection</p>
+            <h2 className="font-title text-5xl sm:text-6xl text-effluve-white tracking-wide">Homme</h2>
+            <div className="mt-5 h-px w-8 bg-effluve-vanilla mx-auto group-hover:w-16 transition-all duration-500" />
+            <p className="font-body mt-4 text-[10px] uppercase tracking-[0.3em] text-white/60 group-hover:text-white/90 transition-colors duration-300">
+              Découvrir →
+            </p>
+          </div>
+        </Link>
+
+      </section>
+
+      {/* ── Manifeste éditorial ── */}
+      <section className="grid grid-cols-1 lg:grid-cols-2 min-h-[560px]">
+
+        {/* Image */}
+        <div className="relative min-h-[400px] lg:min-h-0 overflow-hidden">
+          <Image
+            src="/images/img1.png"
+            alt="Effluve — Savoir-faire"
+            fill
+            sizes="50vw"
+            className="object-cover object-center"
+          />
+        </div>
+
+        {/* Texte */}
+        <div className="flex flex-col justify-center bg-effluve-nero px-12 py-20 lg:px-20">
+          <p className="font-body text-[9px] uppercase tracking-[0.45em] text-effluve-vanilla mb-6">
+            Notre histoire
+          </p>
+          <h2 className="font-title text-4xl sm:text-5xl text-effluve-white leading-tight">
+            Une mode<br />qui a du sens.
+          </h2>
+          <div className="mt-6 h-px w-10 bg-effluve-vanilla" />
+          <p className="font-body mt-6 text-sm text-white/55 leading-loose max-w-sm">
+            Effluve naît d&apos;une conviction simple — les vêtements que l&apos;on porte méritent
+            d&apos;être pensés avec soin. Chaque pièce est conçue en France, avec des matières
+            naturelles et des méthodes artisanales.
+          </p>
+          <Link
+            href="/notre-histoire"
+            className="font-body mt-10 inline-flex items-center gap-3 text-[10px] uppercase tracking-[0.3em] text-effluve-vanilla hover:text-effluve-white transition-colors duration-300 group"
+          >
+            Lire notre histoire
+            <span className="inline-block group-hover:translate-x-1 transition-transform duration-300">→</span>
+          </Link>
+        </div>
+
+      </section>
+
+      {/* ── Nouvelle arrivée — mise en avant éditoriale ── */}
+      <section className="py-24 px-8 bg-[#f9f7f4]">
+        <div className="mx-auto max-w-[1400px]">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-14 gap-4">
+            <div>
+              <p className="font-body text-[9px] uppercase tracking-[0.45em] text-effluve-vanilla mb-3">
+                Saison 2025
+              </p>
+              <h2 className="font-title text-4xl sm:text-5xl text-effluve-black">Nouveautés</h2>
+            </div>
+            <Link
+              href="/collection"
+              className="font-body text-[10px] uppercase tracking-[0.3em] text-effluve-black border-b border-effluve-black pb-1 hover:text-effluve-vanilla hover:border-effluve-vanilla transition-colors duration-300 self-start sm:self-auto"
+            >
+              Voir tout →
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+            {[
+              { src: "/images/img3.png", name: "Veste lin", price: "280 €" },
+              { src: "/images/img4.png", name: "Pantalon droit", price: "190 €" },
+              { src: "/images/img6.png", name: "Chemise oversize", price: "145 €" },
+              { src: "/images/img7.png", name: "Manteau laine", price: "420 €" },
+            ].map(({ src, name, price }) => (
+              <Link key={src} href="/collection" className="group">
+                <div className="relative aspect-[3/4] overflow-hidden bg-neutral-100">
+                  <Image
+                    src={src}
+                    alt={name}
+                    fill
+                    sizes="(max-width: 768px) 50vw, 25vw"
+                    className="object-cover object-top transition-transform duration-700 group-hover:scale-105"
+                  />
+                </div>
+                <div className="mt-4 px-1">
+                  <p className="font-body text-xs text-effluve-black tracking-wide">{name}</p>
+                  <p className="font-body text-xs text-neutral-400 mt-1">{price}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── CTA Newsletter ── */}
+      <section className="py-32 px-6 text-center bg-effluve-white">
+        <p className="font-body text-[9px] uppercase tracking-[0.45em] text-effluve-vanilla mb-5">
+          Nouvelle saison
+        </p>
+        <h2 className="font-title text-5xl sm:text-6xl md:text-7xl text-effluve-black leading-none">
+          Toute la<br />collection
+        </h2>
+        <p className="font-body mt-6 text-xs text-neutral-400 max-w-xs mx-auto leading-relaxed tracking-wide">
+          Femme, homme, retrouvez toutes nos pièces de la saison.
+        </p>
+        <Link
+          href="/collection"
+          className="font-body mt-10 inline-flex h-12 items-center px-12 text-[10px] uppercase tracking-[0.35em] bg-effluve-black text-effluve-white hover:bg-effluve-nero transition-all duration-300"
+        >
+          Voir tout
+        </Link>
+      </section>
+
     </main>
   );
 }

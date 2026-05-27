@@ -9,13 +9,12 @@
     "lint": "eslint",
     "prisma:generate": "prisma generate --schema prisma/schema.prisma",
     "prisma:pull": "prisma db pull --schema prisma/schema.prisma",
-    "prisma:migrate:dev": "prisma migrate dev --schema prisma/schema.prisma",
-    "prisma:migrate:deploy": "prisma migrate deploy --schema prisma/schema.prisma",
+    "prisma:push": "prisma db push --schema prisma/schema.prisma",
     "prisma:studio": "prisma studio --schema prisma/schema.prisma",
-    "prisma:seed": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/seed.ts"
+    "prisma:seed": "tsx prisma/seed.ts"
   },
   "prisma": {
-    "seed": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/seed.ts"
+    "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.19.2",
@@ -26,17 +25,24 @@
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "react-hot-toast": "^2.6.0",
+    "recharts": "^3.8.1",
+    "resend": "^6.12.2",
+    "shippo": "^2.18.0",
     "stripe": "^20.4.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/jest": "^30.0.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.0.4",
+    "jest": "^30.3.0",
+    "jest-environment-node": "^30.3.0",
     "prisma": "^6.19.2",
     "tailwindcss": "^4",
+    "ts-jest": "^29.4.9",
     "ts-node": "^10.9.2",
     "typescript": "^5"
   }

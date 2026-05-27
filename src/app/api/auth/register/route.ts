@@ -2,8 +2,18 @@ import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { signSession, sessionCookie } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { rateLimit, getClientIp } from '@/lib/rate-limit';
 
 export async function POST(req: Request) {
+  const ip = getClientIp(req);
+  const rl = rateLimit(`register:${ip}`, 3, 60 * 60 * 1000);
+  if (!rl.ok) {
+    return NextResponse.json(
+      { error: 'Trop de créations de compte. Réessayez dans 1 heure.' },
+      { status: 429, headers: { 'Retry-After': String(rl.retryAfter) } }
+    );
+  }
+
   const body: unknown = await req.json().catch(() => null);
   const { email, password, full_name } = (body ?? {}) as {
     email?: string;
@@ -40,7 +50,7 @@ export async function POST(req: Request) {
       fullName: safeName,
       role: 'customer',
     },
-    select: { id: true, email: true, fullName: true, role: true },
+    select: { id: true, email: true, fullName: true, role: true, tokenVersion: true },
   });
 
   const user = {
@@ -49,7 +59,7 @@ export async function POST(req: Request) {
     full_name: created.fullName,
     role: created.role,
   };
-  const token = await signSession(user);
+  const token = await signSession(user, created.tokenVersion);
 
   const res = NextResponse.json({ ok: true, user });
   res.cookies.set(sessionCookie.name, token, sessionCookie.options);
