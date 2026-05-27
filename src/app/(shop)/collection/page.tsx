@@ -49,9 +49,7 @@ export default async function CollectionPage() {
           showActions
           emptyState={
             <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
-              <p className="font-semibold text-neutral-900">Aucun produit.</p>
-              <p className="mt-1 text-neutral-600">Ajoute des produits actifs dans MySQL.</p>
-            </div>
+              <p className="font-semibold text-neutral-900">Aucun produit pour le moment.</p>            </div>
           }
         />
       </section>

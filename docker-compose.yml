@@ -4,7 +4,7 @@ services:
     container_name: effluve_db
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: rootroot
       MYSQL_DATABASE: effluve
       MYSQL_USER: effluve
       MYSQL_PASSWORD: effluve
@@ -31,7 +31,6 @@ services:
       DATABASE_URL: mysql://effluve:effluve@db:3306/effluve
       AUTH_SECRET: effluve
       NEXT_PUBLIC_API_URL: http://localhost:3000/api
-      # Renseigner vos clés Stripe ici ou via un fichier .env
       STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
       NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}
     ports:
