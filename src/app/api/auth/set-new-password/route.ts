@@ -8,10 +8,11 @@ import { rateLimit, getClientIp } from "@/lib/rate-limit";
 export async function POST(req: NextRequest) {
   try {
     const ip = getClientIp(req);
-    if (!rateLimit(`reset-pw:${ip}`, 5, 15 * 60 * 1000)) {
+    const rl = rateLimit(`reset-pw:${ip}`, 5, 15 * 60 * 1000);
+    if (!rl.ok) {
       return NextResponse.json(
         { error: "Trop de tentatives. Réessayez dans 15 minutes." },
-        { status: 429 }
+        { status: 429, headers: { "Retry-After": String(rl.retryAfter) } }
       );
     }
 

@@ -4,11 +4,20 @@ import { markOrderAsPaid } from "@/lib/orders";
 import { awardLoyaltyPoints } from "@/lib/loyalty";
 import { prisma } from "@/lib/prisma";
 import { sendOrderConfirmationEmail } from "@/lib/email";
+import { rateLimit } from "@/lib/rate-limit";
 
 // Simule un paiement réussi pour l'environnement de développement.
 export async function POST(req: Request) {
   const user = await getSessionUser();
   if (!user) return NextResponse.json({ error: "UNAUTHENTICATED" }, { status: 401 });
+
+  const rl = rateLimit(`payment:${user.id}`, 10, 60 * 1000);
+  if (!rl.ok) {
+    return NextResponse.json(
+      { error: "Trop de tentatives de paiement. Réessayez dans 1 minute." },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfter) } }
+    );
+  }
 
   const body = (await req.json().catch(() => null)) as { orderId?: number } | null;
   const orderId = Number(body?.orderId);

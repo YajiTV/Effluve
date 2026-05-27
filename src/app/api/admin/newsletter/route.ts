@@ -3,11 +3,20 @@ import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getResendClient, getFromAddress } from "@/lib/resend";
 import { createAdminLog } from "@/lib/admin-log";
+import { rateLimit } from "@/lib/rate-limit";
 
 export async function POST(req: Request) {
   const user = await getSessionUser();
   if (!user) return NextResponse.json({ error: "UNAUTHENTICATED" }, { status: 401 });
   if (user.role !== "admin" && user.role !== "superadmin") return NextResponse.json({ error: "FORBIDDEN" }, { status: 403 });
+
+  const rl = rateLimit(`newsletter:${user.id}`, 1, 10 * 60 * 1000);
+  if (!rl.ok) {
+    return NextResponse.json(
+      { error: "Un envoi est déjà en cours ou vient d'être effectué. Réessayez dans 10 minutes." },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfter) } }
+    );
+  }
 
   const body = (await req.json().catch(() => null)) as { subject?: string; html?: string } | null;
   const subject = String(body?.subject ?? "").trim();

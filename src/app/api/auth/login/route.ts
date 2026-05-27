@@ -7,8 +7,12 @@ import { rateLimit, getClientIp } from '@/lib/rate-limit';
 export async function POST(req: Request) {
   try {
     const ip = getClientIp(req);
-    if (!rateLimit(`login:${ip}`, 10, 15 * 60 * 1000)) {
-      return NextResponse.json({ error: 'Trop de tentatives. Réessayez dans 15 minutes.' }, { status: 429 });
+    const rl = rateLimit(`login:${ip}`, 5, 15 * 60 * 1000);
+    if (!rl.ok) {
+      return NextResponse.json(
+        { error: 'Trop de tentatives. Réessayez dans 15 minutes.' },
+        { status: 429, headers: { 'Retry-After': String(rl.retryAfter) } }
+      );
     }
 
     const body: unknown = await req.json().catch(() => null);

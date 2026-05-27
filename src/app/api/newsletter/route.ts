@@ -5,8 +5,12 @@ import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
 export async function POST(req: Request) {
   const ip = getClientIp(req);
-  if (!rateLimit(`newsletter:${ip}`, 5, 60 * 60 * 1000)) {
-    return NextResponse.json({ error: "Trop de tentatives." }, { status: 429 });
+  const rl = rateLimit(`newsletter:${ip}`, 5, 60 * 60 * 1000);
+  if (!rl.ok) {
+    return NextResponse.json(
+      { error: "Trop de tentatives." },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfter) } }
+    );
   }
 
   const body = await req.json().catch(() => null);
