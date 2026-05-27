@@ -9,6 +9,7 @@ export type OrderSummary = {
   createdAt: string;
   totalCents: number;
   paymentStatus: OrderStatus;
+  stripeInvoiceUrl: string | null;
 };
 
 export type OrderDetail = {
@@ -187,6 +188,7 @@ export async function getOrdersByUserId(userId: number): Promise<OrderSummary[]>
       createdAt: true,
       totalCents: true,
       paymentStatus: true,
+      stripeInvoiceUrl: true,
     },
   });
 
@@ -196,6 +198,7 @@ export async function getOrdersByUserId(userId: number): Promise<OrderSummary[]>
     createdAt: row.createdAt.toISOString(),
     totalCents: row.totalCents,
     paymentStatus: row.paymentStatus,
+    stripeInvoiceUrl: row.stripeInvoiceUrl ?? null,
   }));
 }
 
