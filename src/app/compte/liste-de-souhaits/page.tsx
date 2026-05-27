@@ -1,5 +1,6 @@
 // src/app/compte/liste-de-souhaits/page.tsx
 "use client";
+import { apiFetch } from '@/lib/apiFetch';
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -42,7 +43,7 @@ export default function WishlistPage() {
   useEffect(() => {
     const load = async () => {
       try {
-        const res = await fetch("/api/wishlist", { cache: "no-store" });
+        const res = await apiFetch("/api/wishlist", { cache: "no-store" });
 
         if (res.status === 401) {
           setIsGuest(true);
@@ -64,7 +65,7 @@ export default function WishlistPage() {
   }, []);
 
   const reloadWishlist = async () => {
-    const res = await fetch("/api/wishlist", { cache: "no-store" }).catch(() => null);
+    const res = await apiFetch("/api/wishlist", { cache: "no-store" }).catch(() => null);
     if (res?.ok) setFavorites((await res.json()) as WishlistItem[]);
   };
 
@@ -73,7 +74,7 @@ export default function WishlistPage() {
     const prev = favorites;
     setFavorites((p) => p.filter((item) => item.id !== id));
 
-    const res = await fetch(`/api/wishlist/${id}`, { method: "DELETE" }).catch(() => null);
+    const res = await apiFetch(`/api/wishlist/${id}`, { method: "DELETE" }).catch(() => null);
 
     if (!res) {
       setFavorites(prev);
@@ -102,7 +103,7 @@ export default function WishlistPage() {
     try {
       setAddingProductId(product.productId);
 
-      const res = await fetch("/api/cart/add", {
+      const res = await apiFetch("/api/cart/add", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ productId: product.productId }),

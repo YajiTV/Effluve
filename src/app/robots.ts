@@ -12,11 +12,6 @@ export default function robots(): MetadataRoute.Robots {
           "/api/",
           "/commande/",
           "/panier",
-          // Routes anglaises doublons (évite le duplicate content)
-          "/account/",
-          "/cart/",
-          "/checkout/",
-          "/products/",
           // Pages auth (aucune valeur SEO)
           "/connexion/",
           "/inscription/",

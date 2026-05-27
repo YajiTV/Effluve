@@ -34,7 +34,7 @@ export default function RetoursPage() {
           </section>
 
           <Link
-            href="/account/returns"
+            href="/compte/retours"
             className="inline-block mt-4 px-6 py-3 bg-effluve-black text-effluve-white text-xs uppercase tracking-[0.2em] hover:bg-effluve-vanilla hover:text-effluve-nero transition-colors"
           >
             Faire une demande de retour
